@@ -4,44 +4,44 @@ import { NotificationService } from "../services/NotificationService";
 export class NotificationController {
   private notificationService = new NotificationService();
 
-  async getAllNotifications(req: Request, res: Response): Promise<Response> {
+  async getAllNotifications(req: Request, res: Response): Promise<void> {
     try {
       const notifications =
         await this.notificationService.getAllNotifications();
-      return res.json(notifications);
+      res.json(notifications);
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async getNotificationById(req: Request, res: Response): Promise<Response> {
+  async getNotificationById(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const notification = await this.notificationService.getNotificationById(
         id
       );
       if (!notification) {
-        return res.status(404).json({ message: "Notificação não encontrada" });
+        res.status(404).json({ message: "Notificação não encontrada" });
       }
-      return res.json(notification);
+      res.json(notification);
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async createNotification(req: Request, res: Response): Promise<Response> {
+  async createNotification(req: Request, res: Response): Promise<void> {
     try {
       const notificationData = req.body;
       const notification = await this.notificationService.createNotification(
         notificationData
       );
-      return res.status(201).json(notification);
+      res.status(201).json(notification);
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async updateNotification(req: Request, res: Response): Promise<Response> {
+  async updateNotification(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const notificationData = req.body;
@@ -50,24 +50,24 @@ export class NotificationController {
         notificationData
       );
       if (!notification) {
-        return res.status(404).json({ message: "Notificação não encontrada" });
+        res.status(404).json({ message: "Notificação não encontrada" });
       }
-      return res.json(notification);
+      res.json(notification);
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
-  async deleteNotification(req: Request, res: Response): Promise<Response> {
+  async deleteNotification(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const success = await this.notificationService.deleteNotification(id);
       if (!success) {
-        return res.status(404).json({ message: "Notificação não encontrada" });
+        res.status(404).json({ message: "Notificação não encontrada" });
       }
-      return res.json({ message: "Notificação deletada com sucesso" });
+      res.json({ message: "Notificação deletada com sucesso" });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 }
