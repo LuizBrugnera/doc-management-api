@@ -4,16 +4,22 @@ import { DepartmentService } from "../services/DepartmentService";
 export class DepartmentController {
   private departmentService = new DepartmentService();
 
-  async getAllDepartments(req: Request, res: Response): Promise<void> {
+  public getAllDepartments = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const departments = await this.departmentService.getAllDepartments();
       res.json(departments);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getDepartmentById(req: Request, res: Response): Promise<void> {
+  public getDepartmentById = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const department = await this.departmentService.getDepartmentById(id);
@@ -24,9 +30,12 @@ export class DepartmentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createDepartment(req: Request, res: Response): Promise<void> {
+  public createDepartment = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const departmentData = req.body;
       const department = await this.departmentService.createDepartment(
@@ -36,9 +45,12 @@ export class DepartmentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateDepartment(req: Request, res: Response): Promise<void> {
+  public updateDepartment = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const departmentData = req.body;
@@ -53,9 +65,12 @@ export class DepartmentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteDepartment(req: Request, res: Response): Promise<void> {
+  public deleteDepartment = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.departmentService.deleteDepartment(id);
@@ -66,5 +81,5 @@ export class DepartmentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

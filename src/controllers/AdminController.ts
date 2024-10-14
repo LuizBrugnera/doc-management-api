@@ -4,16 +4,16 @@ import { AdminService } from "../services/AdminService";
 export class AdminController {
   private adminService = new AdminService();
 
-  async getAllAdmins(req: Request, res: Response): Promise<void> {
+  public getAllAdmins = async (req: Request, res: Response): Promise<void> => {
     try {
       const admins = await this.adminService.getAllAdmins();
       res.json(admins);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getAdminById(req: Request, res: Response): Promise<void> {
+  public getAdminById = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const admin = await this.adminService.getAdminById(id);
@@ -24,9 +24,9 @@ export class AdminController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createAdmin(req: Request, res: Response): Promise<void> {
+  public createAdmin = async (req: Request, res: Response): Promise<void> => {
     try {
       const adminData = req.body;
       const admin = await this.adminService.createAdmin(adminData);
@@ -34,9 +34,9 @@ export class AdminController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateAdmin(req: Request, res: Response): Promise<void> {
+  public updateAdmin = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const adminData = req.body;
@@ -48,9 +48,9 @@ export class AdminController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteAdmin(req: Request, res: Response): Promise<void> {
+  public deleteAdmin = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.adminService.deleteAdmin(id);
@@ -61,5 +61,5 @@ export class AdminController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

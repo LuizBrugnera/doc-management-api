@@ -4,16 +4,22 @@ import { AdminLogService } from "../services/AdminLogService";
 export class AdminLogController {
   private adminLogService = new AdminLogService();
 
-  async getAllAdminLogs(req: Request, res: Response): Promise<void> {
+  public getAllAdminLogs = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const adminLogs = await this.adminLogService.getAllAdminLogs();
       res.json(adminLogs);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getAdminLogById(req: Request, res: Response): Promise<void> {
+  public getAdminLogById = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const adminLog = await this.adminLogService.getAdminLogById(id);
@@ -26,9 +32,12 @@ export class AdminLogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createAdminLog(req: Request, res: Response): Promise<void> {
+  public createAdminLog = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const data = req.body;
       const adminLog = await this.adminLogService.createAdminLog(data);
@@ -36,9 +45,12 @@ export class AdminLogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateAdminLog(req: Request, res: Response): Promise<void> {
+  public updateAdminLog = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const data = req.body;
@@ -52,9 +64,12 @@ export class AdminLogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteAdminLog(req: Request, res: Response): Promise<void> {
+  public deleteAdminLog = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.adminLogService.deleteAdminLog(id);
@@ -67,5 +82,5 @@ export class AdminLogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

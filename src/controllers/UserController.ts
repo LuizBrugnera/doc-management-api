@@ -4,16 +4,16 @@ import { UserService } from "../services/UserService";
 export class UserController {
   private userService = new UserService();
 
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  public getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
       const users = await this.userService.getAllUsers();
       res.json(users);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getUserById(req: Request, res: Response): Promise<void> {
+  public getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const user = await this.userService.getUserById(id);
@@ -24,9 +24,9 @@ export class UserController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createUser(req: Request, res: Response): Promise<void> {
+  public createUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const userData = req.body;
       const user = await this.userService.createUser(userData);
@@ -34,9 +34,9 @@ export class UserController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateUser(req: Request, res: Response): Promise<void> {
+  public updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const userData = req.body;
@@ -48,9 +48,9 @@ export class UserController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteUser(req: Request, res: Response): Promise<void> {
+  public deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.userService.deleteUser(id);
@@ -61,5 +61,5 @@ export class UserController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

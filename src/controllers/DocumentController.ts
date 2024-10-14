@@ -4,16 +4,22 @@ import { DocumentService } from "../services/DocumentService";
 export class DocumentController {
   private documentService = new DocumentService();
 
-  async getAllDocuments(req: Request, res: Response): Promise<void> {
+  public getAllDocuments = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const documents = await this.documentService.getAllDocuments();
       res.json(documents);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getDocumentById(req: Request, res: Response): Promise<void> {
+  public getDocumentById = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const document = await this.documentService.getDocumentById(id);
@@ -24,9 +30,12 @@ export class DocumentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createDocument(req: Request, res: Response): Promise<void> {
+  public createDocument = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const documentData = req.body;
       const document = await this.documentService.createDocument(documentData);
@@ -34,9 +43,12 @@ export class DocumentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateDocument(req: Request, res: Response): Promise<void> {
+  public updateDocument = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const documentData = req.body;
@@ -51,9 +63,12 @@ export class DocumentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteDocument(req: Request, res: Response): Promise<void> {
+  public deleteDocument = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.documentService.deleteDocument(id);
@@ -64,5 +79,5 @@ export class DocumentController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

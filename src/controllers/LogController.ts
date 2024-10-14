@@ -4,16 +4,16 @@ import { LogService } from "../services/LogService";
 export class LogController {
   private logService = new LogService();
 
-  async getAllLogs(req: Request, res: Response): Promise<void> {
+  public getAllLogs = async (req: Request, res: Response): Promise<void> => {
     try {
       const logs = await this.logService.getAllLogs();
       res.json(logs);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getLogById(req: Request, res: Response): Promise<void> {
+  public getLogById = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const log = await this.logService.getLogById(id);
@@ -24,9 +24,9 @@ export class LogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createLog(req: Request, res: Response): Promise<void> {
+  public createLog = async (req: Request, res: Response): Promise<void> => {
     try {
       const data = req.body;
       const log = await this.logService.createLog(data);
@@ -34,9 +34,9 @@ export class LogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateLog(req: Request, res: Response): Promise<void> {
+  public updateLog = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const data = req.body;
@@ -48,9 +48,9 @@ export class LogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteLog(req: Request, res: Response): Promise<void> {
+  public deleteLog = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.logService.deleteLog(id);
@@ -61,5 +61,5 @@ export class LogController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }

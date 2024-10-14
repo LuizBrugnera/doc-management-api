@@ -4,7 +4,10 @@ import { NotificationService } from "../services/NotificationService";
 export class NotificationController {
   private notificationService = new NotificationService();
 
-  async getAllNotifications(req: Request, res: Response): Promise<void> {
+  public getAllNotifications = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const notifications =
         await this.notificationService.getAllNotifications();
@@ -12,9 +15,12 @@ export class NotificationController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async getNotificationById(req: Request, res: Response): Promise<void> {
+  public getNotificationById = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const notification = await this.notificationService.getNotificationById(
@@ -27,9 +33,12 @@ export class NotificationController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async createNotification(req: Request, res: Response): Promise<void> {
+  public createNotification = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const notificationData = req.body;
       const notification = await this.notificationService.createNotification(
@@ -39,9 +48,12 @@ export class NotificationController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async updateNotification(req: Request, res: Response): Promise<void> {
+  public updateNotification = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const notificationData = req.body;
@@ -56,9 +68,12 @@ export class NotificationController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 
-  async deleteNotification(req: Request, res: Response): Promise<void> {
+  public deleteNotification = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const success = await this.notificationService.deleteNotification(id);
@@ -69,5 +84,5 @@ export class NotificationController {
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }
+  };
 }
