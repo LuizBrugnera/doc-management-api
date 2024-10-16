@@ -10,6 +10,12 @@ export class DepartmentService {
     });
   }
 
+  async getDepartmentByEmail(email: string): Promise<Department | null> {
+    return await this.departmentRepository.findOne({
+      where: { email },
+    });
+  }
+
   async getDepartmentById(id: number): Promise<Department | null> {
     return await this.departmentRepository.findOne({
       where: { id },

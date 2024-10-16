@@ -6,6 +6,7 @@ import documentRoutes from "./documentRoutes";
 import notificationRoutes from "./notificationRoutes";
 import logRoutes from "./logRoutes";
 import adminLogRoutes from "./adminLogRoutes";
+import authRoutes from "./authRoutes";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/documents", documentRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/logs", logRoutes);
 router.use("/admin-logs", adminLogRoutes);
+router.use("/auth", authRoutes);
 
 export default router;

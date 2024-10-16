@@ -15,6 +15,13 @@ export class AdminService {
     });
   }
 
+  async getAdminByEmail(email: string): Promise<Admin | null> {
+    return await this.adminRepository.findOne({
+      where: { email: email },
+      relations: ["adminLogs"],
+    });
+  }
+
   async createAdmin(adminData: Partial<Admin>): Promise<Admin> {
     const admin = this.adminRepository.create(adminData);
     return await this.adminRepository.save(admin);
