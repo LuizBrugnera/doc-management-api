@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { join } from "path";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 const dir = __dirname;
 export const AppDataSource = new DataSource({
@@ -13,4 +14,5 @@ export const AppDataSource = new DataSource({
   migrations: [join(dir, "migrations", "*.{js,ts}")],
   synchronize: false,
   logging: false,
+  namingStrategy: new SnakeNamingStrategy(),
 });
