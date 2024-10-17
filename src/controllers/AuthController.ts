@@ -196,11 +196,17 @@ export class AuthController {
         return;
       }
 
+      const folderAccess =
+        await this.folderAccessService.getFolderAccessByDepartmentId(
+          departmentUserExists.id
+        );
+
       const token = await this.authService.generateToken({
         id: departmentUserExists.id,
         email: departmentUserExists.email,
         department: departmentUserExists.department,
         role: "department",
+        folderAccess,
       });
       res.status(200).send(token);
     } catch (error) {

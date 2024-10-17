@@ -14,14 +14,20 @@ export const authMiddleware = (
 
   try {
     const verified = jwt.verify(token, process.env.SECRET_KEY as string);
-    const { id, email, iat, exp, department, role } = verified as {
-      id: string;
-      email: string;
-      iat: number;
-      exp: number;
-      department: string;
-      role: string;
-    };
+    const { id, email, iat, exp, department, role, folderAccess } =
+      verified as {
+        id: string;
+        email: string;
+        iat: number;
+        exp: number;
+        department?: string;
+        role: string;
+        folderAccess?: {
+          id: number;
+          foldername: string;
+          departmentId: number;
+        }[];
+      };
     req.user = {
       id: +id,
       email,
@@ -29,6 +35,7 @@ export const authMiddleware = (
       exp: +exp,
       department,
       role,
+      folderAccess,
     };
     next();
   } catch (error) {
