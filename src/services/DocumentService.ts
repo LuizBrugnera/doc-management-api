@@ -16,6 +16,50 @@ export class DocumentService {
       relations: ["user"],
     });
   }
+  async getDocumentsByUserId(userId: number): Promise<Document[]> {
+    return await this.documentRepository.find({
+      where: { user: { id: userId } },
+      relations: ["user"],
+    });
+  }
+
+  async getDocumentsByFolder(folder: string): Promise<Document[]> {
+    return await this.documentRepository.find({
+      where: { folder },
+      relations: ["user"],
+    });
+  }
+
+  async getDocumentsWithUsernames(): Promise<any[]> {
+    const documents = await this.documentRepository
+      .createQueryBuilder("documents")
+      .innerJoin("documents.user", "users")
+      .select([
+        "documents.id",
+        "documents.userId",
+        "documents.name",
+        "users.name",
+      ])
+      .addSelect("users.name", "username")
+      .getRawMany();
+
+    return documents;
+  }
+
+  async getDocumentsByUserIdAndFolder(
+    userId: number,
+    folder: string
+  ): Promise<Document[]> {
+    return await this.documentRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+        folder,
+      },
+      order: { date: "DESC" },
+    });
+  }
 
   async createDocument(documentData: Partial<Document>): Promise<Document> {
     const user = await this.userRepository.findOneBy({
@@ -38,6 +82,16 @@ export class DocumentService {
     }
     this.documentRepository.merge(document, documentData);
     return await this.documentRepository.save(document);
+  }
+
+  async updateDocumentUserId(
+    documentId: number,
+    newUserId: number
+  ): Promise<void> {
+    await this.documentRepository.update(
+      { id: documentId },
+      { user: { id: newUserId } }
+    );
   }
 
   async deleteDocument(id: number): Promise<boolean> {

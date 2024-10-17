@@ -21,19 +21,29 @@ export class User {
   @Column()
   mainEmail: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   cnpj: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   rg: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   cpf: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   phone: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   cod: string;
 
   @Column()

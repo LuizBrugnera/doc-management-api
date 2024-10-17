@@ -18,6 +18,13 @@ export class FolderAccessService {
       relations: ["department"],
     });
   }
+  async getFolderAccessByDepartmentId(
+    departmentId: number
+  ): Promise<FolderAccess[]> {
+    return await this.folderAccessRepository.find({
+      where: { department: { id: departmentId } },
+    });
+  }
 
   async createFolderAccess(data: Partial<FolderAccess>): Promise<FolderAccess> {
     const department = await this.departmentRepository.findOneBy({
