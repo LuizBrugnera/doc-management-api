@@ -5,11 +5,12 @@ export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).send("Acesso negado.");
+    res.status(401).send("Acesso negado.");
+    return;
   }
 
   try {
