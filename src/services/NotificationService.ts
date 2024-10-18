@@ -17,6 +17,21 @@ export class NotificationService {
     });
   }
 
+  async updateNotificationRead(id: number): Promise<Notification | null> {
+    const notification = await this.notificationRepository.findOneBy({ id });
+    if (!notification) {
+      return null;
+    }
+    notification.viewed = true;
+    return await this.notificationRepository.save(notification);
+  }
+
+  async getNotificationByUserId(userId: number): Promise<Notification[]> {
+    return await this.notificationRepository.find({
+      where: { user: { id: userId } },
+    });
+  }
+
   async createNotification(
     notificationData: Partial<Notification>
   ): Promise<Notification> {

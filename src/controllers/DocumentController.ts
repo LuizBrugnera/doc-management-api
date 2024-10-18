@@ -11,6 +11,7 @@ import { DepartmentService } from "../services/DepartmentService";
 import { AdminService } from "../services/AdminService";
 import { AdminLogService } from "../services/AdminLogService";
 import { Document } from "typeorm";
+import { FolderAccessService } from "../services/FolderAccessService";
 
 export class DocumentController {
   private userService = new UserService();
@@ -20,6 +21,7 @@ export class DocumentController {
   private notificationService = new NotificationService();
   private logService = new LogService();
   private adminLogService = new AdminLogService();
+  private folderAccessService = new FolderAccessService();
 
   private static readonly folderNames = [
     "boletos",
@@ -488,7 +490,7 @@ export class DocumentController {
     res: Response
   ): Promise<void> => {
     try {
-      const userId = this.getUserId(req);
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(400).json({ message: "Usuário não encontrado" });
@@ -502,13 +504,20 @@ export class DocumentController {
     }
   };
 
-  public getDocumentsByFolder = async (
+  public getDocumentsByDepartmentFolderAccess = async (
     req: Request,
     res: Response
   ): Promise<void> => {
     try {
-      const folderAccess = req.user?.folderAccess;
-
+      const departmentId = req.user?.id;
+      if (!departmentId) {
+        res.status(400).json({ message: "Id do Departamento não encontrado" });
+        return;
+      }
+      const folderAccess =
+        await this.folderAccessService.getFolderAccessByDepartmentId(
+          departmentId
+        );
       if (!folderAccess) {
         res.status(400).json({ message: "Acessos não encontrados" });
         return;

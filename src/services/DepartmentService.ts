@@ -7,6 +7,18 @@ export class DepartmentService {
   async getAllDepartments(): Promise<Department[]> {
     return await this.departmentRepository.find({
       relations: ["foldersAccess", "logs"],
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        password: false,
+        department: true,
+        created_at: true,
+        updated_at: true,
+        foldersAccess: true,
+        logs: true,
+      },
     });
   }
 
@@ -19,6 +31,13 @@ export class DepartmentService {
   async getDepartmentById(id: number): Promise<Department | null> {
     return await this.departmentRepository.findOne({
       where: { id },
+      relations: ["foldersAccess", "logs"],
+    });
+  }
+
+  async getDepartmentByDepartment(department: string): Promise<Department[]> {
+    return await this.departmentRepository.find({
+      where: { department },
       relations: ["foldersAccess", "logs"],
     });
   }

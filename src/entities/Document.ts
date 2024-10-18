@@ -19,7 +19,7 @@ export class Document {
   @Column()
   type: string;
 
-  @Column()
+  @Column({ default: "Não Informado" })
   description: string;
 
   @Column()

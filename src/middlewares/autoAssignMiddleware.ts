@@ -81,4 +81,4 @@ const fileFilter = (
   }
 };
 
-export const fastupload = multer({ storage, fileFilter });
+export const autoAssignUpload = multer({ storage, fileFilter });
