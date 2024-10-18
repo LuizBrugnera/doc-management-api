@@ -35,6 +35,41 @@ export class NotificationController {
     }
   };
 
+  public updateNotificationRead = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const id = parseInt(req.params.id);
+      const notification =
+        await this.notificationService.updateNotificationRead(id);
+      if (!notification) {
+        res.status(404).json({ message: "Notificação não encontrada" });
+      }
+      res.json(notification);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  public getNotificationByUserId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(400).json({ message: "Usuário não encontrado" });
+        return;
+      }
+      const notifications =
+        await this.notificationService.getNotificationByUserId(userId);
+      res.json(notifications);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public createNotification = async (
     req: Request,
     res: Response

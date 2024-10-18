@@ -19,10 +19,10 @@ export class Notification {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: false })
   viewed: boolean;
 
-  @Column()
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   date: Date;
 
   @ManyToOne(() => User, (user) => user.notifications)
