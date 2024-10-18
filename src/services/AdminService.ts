@@ -5,20 +5,28 @@ export class AdminService {
   private adminRepository = AppDataSource.getRepository(Admin);
 
   async getAllAdmins(): Promise<Admin[]> {
-    return await this.adminRepository.find({ relations: ["adminLogs"] });
+    return await this.adminRepository.find();
   }
 
   async getAdminById(id: number): Promise<Admin | null> {
     return await this.adminRepository.findOne({
       where: { id },
-      relations: ["adminLogs"],
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        created_at: true,
+        updated_at: true,
+        adminLogs: false,
+        password: false,
+      },
     });
   }
 
   async getAdminByEmail(email: string): Promise<Admin | null> {
     return await this.adminRepository.findOne({
       where: { email: email },
-      relations: ["adminLogs"],
     });
   }
 
