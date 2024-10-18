@@ -13,7 +13,23 @@ export class UserService {
 
   async getAllUsers(): Promise<User[]> {
     return await this.userRepository.find({
-      relations: ["documents", "notifications", "emailUserDepartments"],
+      relations: ["documents", "emailUserDepartments"],
+      select: {
+        cnpj: true,
+        rg: true,
+        cpf: true,
+        phone: true,
+        cod: true,
+        id: true,
+        name: true,
+        mainEmail: true,
+        created_at: true,
+        updated_at: true,
+        documents: true,
+        emailUserDepartments: true,
+        password: false,
+        notifications: false,
+      },
     });
   }
 
@@ -55,7 +71,22 @@ export class UserService {
   async getUserById(id: number): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { id },
-      relations: ["documents", "notifications", "emailUserDepartments"],
+      select: {
+        cnpj: true,
+        cod: true,
+        cpf: true,
+        phone: true,
+        rg: true,
+        id: true,
+        name: true,
+        mainEmail: true,
+        created_at: true,
+        updated_at: true,
+        documents: false,
+        emailUserDepartments: false,
+        password: false,
+        notifications: false,
+      },
     });
   }
 
