@@ -19,7 +19,9 @@ export class Admin {
   @Column()
   email: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   phone: string;
 
   @Column()
