@@ -11,6 +11,9 @@ import {
   resetTokens,
 } from "../helper/EmailData";
 import { EmailHelper } from "../helper/EmailHelper";
+import { Admin } from "../entities/Admin";
+import { Department } from "../entities/Department";
+import { User } from "../entities/User";
 
 export class AuthController {
   private authService = new AuthService();
@@ -19,6 +22,26 @@ export class AuthController {
   private adminService = new AdminService();
   private departmentService = new DepartmentService();
   private folderAccessService = new FolderAccessService();
+
+  private roleGetter: {
+    [key: string]: (id: number) => Promise<Admin | Department | User>;
+  } = {
+    admin: async (id: number): Promise<Admin> => {
+      const admin = await this.adminService.getAdminById(id);
+      if (!admin) throw new Error("Admin not found");
+      return admin;
+    },
+    department: async (id: number): Promise<Department> => {
+      const department = await this.departmentService.getDepartmentById(id);
+      if (!department) throw new Error("Department not found");
+      return department;
+    },
+    user: async (id: number): Promise<User> => {
+      const user = await this.userService.getUserById(id);
+      if (!user) throw new Error("User not found");
+      return user;
+    },
+  };
 
   registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -142,10 +165,18 @@ export class AuthController {
   loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, cpf, password } = req.body;
-      const key = email ? "mainEmail" : cpf ? "cpf" : "cpnj";
+      const key = email ? "email" : cpf ? "cpf" : "cnpj";
+
+      if (!req.body[key]) {
+        res.status(400).send("Email ou CPF não informado.");
+        return;
+      }
+
+      const bodyKey = key === "email" ? "mainEmail" : key;
+
       const userExists = await this.userService.getUserByKey(
         key,
-        req.body[key]
+        req.body[bodyKey]
       );
 
       if (!userExists) {
@@ -171,6 +202,7 @@ export class AuthController {
       });
       res.status(200).send(token);
     } catch (error) {
+      console.log(error);
       res.status(500).send("Erro ao fazer login.");
     }
   };
@@ -378,6 +410,21 @@ export class AuthController {
       console.log(error);
       res.status(500).send("Erro ao atualizar senha.");
       return;
+    }
+  };
+
+  getUserInfo = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+
+      if (!user) {
+        res.status(400).send("User not found.");
+        return;
+      }
+      const userInfo = await this.roleGetter[user.role](user.id);
+      res.status(200).json(userInfo);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   };
 }
