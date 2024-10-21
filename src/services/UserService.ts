@@ -90,6 +90,12 @@ export class UserService {
     });
   }
 
+  async getUserByIdWithPassword(id: number): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
   async createUser(userData: Partial<User>): Promise<User> {
     const user = this.userRepository.create(userData);
     return await this.userRepository.save(user);

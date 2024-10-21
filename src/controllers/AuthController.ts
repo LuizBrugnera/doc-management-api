@@ -172,11 +172,11 @@ export class AuthController {
         return;
       }
 
-      const bodyKey = key === "email" ? "mainEmail" : key;
+      const formatedKey = key === "email" ? "mainEmail" : key;
 
       const userExists = await this.userService.getUserByKey(
-        key,
-        req.body[bodyKey]
+        formatedKey,
+        req.body[key]
       );
 
       if (!userExists) {
@@ -282,7 +282,12 @@ export class AuthController {
     const { email } = req.body;
 
     const userExists = await this.userService.getUserByEmail(email);
-    if (!userExists) {
+    const departmentExists = await this.departmentService.getDepartmentByEmail(
+      email
+    );
+    const adminExists = await this.adminService.getAdminByEmail(email);
+
+    if (!userExists && !departmentExists && !adminExists) {
       res.status(400).send("Email não cadastrado.");
       return;
     }
@@ -386,7 +391,9 @@ export class AuthController {
 
       const { id } = req.user;
 
-      const userExists = await this.userService.getUserById(Number(id));
+      const userExists = await this.userService.getUserByIdWithPassword(
+        Number(id)
+      );
       if (!userExists) {
         res.status(400).send("User not found.");
         return;
