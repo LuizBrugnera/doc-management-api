@@ -25,7 +25,9 @@ export class Notification {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   date: Date;
 
-  @ManyToOne(() => User, (user) => user.notifications)
+  @ManyToOne(() => User, (user) => user.notifications, {
+    onDelete: "CASCADE",
+  })
   user: User;
 
   @CreateDateColumn()

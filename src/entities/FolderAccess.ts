@@ -16,7 +16,9 @@ export class FolderAccess {
   @Column()
   foldername: string;
 
-  @ManyToOne(() => Department, (department) => department.foldersAccess)
+  @ManyToOne(() => Department, (department) => department.foldersAccess, {
+    onDelete: "CASCADE",
+  })
   department: Department;
 
   @CreateDateColumn()

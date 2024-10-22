@@ -31,7 +31,9 @@ export class Document {
   @Column()
   folder: string;
 
-  @ManyToOne(() => User, (user) => user.documents)
+  @ManyToOne(() => User, (user) => user.documents, {
+    onDelete: "CASCADE",
+  })
   user: User;
 
   @CreateDateColumn()

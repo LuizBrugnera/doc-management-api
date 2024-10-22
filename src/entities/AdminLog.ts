@@ -25,7 +25,9 @@ export class AdminLog {
   @Column()
   date: Date;
 
-  @ManyToOne(() => Admin, (admin) => admin.adminLogs)
+  @ManyToOne(() => Admin, (admin) => admin.adminLogs, {
+    onDelete: "CASCADE",
+  })
   admin: Admin;
 
   @CreateDateColumn()

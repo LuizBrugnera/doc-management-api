@@ -25,7 +25,9 @@ export class Log {
   @Column()
   date: Date;
 
-  @ManyToOne(() => Department, (department) => department.logs)
+  @ManyToOne(() => Department, (department) => department.logs, {
+    onDelete: "CASCADE",
+  })
   department: Department;
 
   @CreateDateColumn()

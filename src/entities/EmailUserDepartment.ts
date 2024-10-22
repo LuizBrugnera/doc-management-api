@@ -19,7 +19,9 @@ export class EmailUserDepartment {
   @Column()
   department: string;
 
-  @ManyToOne(() => User, (user) => user.emailUserDepartments)
+  @ManyToOne(() => User, (user) => user.emailUserDepartments, {
+    onDelete: "CASCADE",
+  })
   user: User;
 
   @CreateDateColumn()
