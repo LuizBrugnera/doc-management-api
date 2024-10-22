@@ -27,7 +27,7 @@ export class AuthController {
     [key: string]: (id: number) => Promise<Admin | Department | User>;
   } = {
     admin: async (id: number): Promise<Admin> => {
-      const admin = await this.adminService.getAdminById(id);
+      const admin = await this.adminService.getAdminByIdWithPassword(id);
       if (!admin) throw new Error("Admin not found");
       return admin;
     },
@@ -37,7 +37,33 @@ export class AuthController {
       return department;
     },
     user: async (id: number): Promise<User> => {
-      const user = await this.userService.getUserById(id);
+      const user = await this.userService.getUserByIdWithPassword(id);
+      if (!user) throw new Error("User not found");
+      return user;
+    },
+  };
+
+  private rolePasswordUpdater: {
+    [key: string]: (
+      id: number,
+      password: string
+    ) => Promise<Admin | Department | User | null>;
+  } = {
+    admin: async (id: number, password: string): Promise<Admin> => {
+      const admin = await this.adminService.updatePasswordById(id, password);
+      if (!admin) throw new Error("Admin not found");
+      return admin;
+    },
+    department: async (id: number, password: string): Promise<Department> => {
+      const department = await this.departmentService.updatePasswordById(
+        id,
+        password
+      );
+      if (!department) throw new Error("Department not found");
+      return department;
+    },
+    user: async (id: number, password: string): Promise<User> => {
+      const user = await this.userService.updatePasswordById(id, password);
       if (!user) throw new Error("User not found");
       return user;
     },
@@ -121,14 +147,8 @@ export class AuthController {
 
   registerDepartment = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, email, phone, password, department, folderAccess } =
+      const { name, email, phone, password, department, foldersAccess } =
         req.body;
-
-      /* 
-        interface FoldersAccess {
-          foldername: string;
-        }
-      */
 
       const departmentUserExists =
         await this.departmentService.getDepartmentByEmail(email);
@@ -149,7 +169,7 @@ export class AuthController {
         departmentUser
       );
 
-      folderAccess.forEach(async (folder: { foldername: string }) => {
+      foldersAccess.forEach(async (folder: { foldername: string }) => {
         await this.folderAccessService.createFolderAccess({
           foldername: folder.foldername,
           department: newDepartment,
@@ -389,11 +409,10 @@ export class AuthController {
         return;
       }
 
-      const { id } = req.user;
+      const { id, role } = req.user;
 
-      const userExists = await this.userService.getUserByIdWithPassword(
-        Number(id)
-      );
+      const userExists = await this.roleGetter[role](Number(id));
+
       if (!userExists) {
         res.status(400).send("User not found.");
         return;
@@ -410,7 +429,7 @@ export class AuthController {
 
       const hashedPassword = await this.authService.hashPassword(newPassword);
 
-      await this.userService.updatePasswordById(Number(id), hashedPassword);
+      await this.rolePasswordUpdater[role](Number(id), hashedPassword);
 
       res.status(200).send("Password updated successfully.");
     } catch (error) {

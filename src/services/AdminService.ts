@@ -24,6 +24,12 @@ export class AdminService {
     });
   }
 
+  async getAdminByIdWithPassword(id: number): Promise<Admin | null> {
+    return await this.adminRepository.findOne({
+      where: { id },
+    });
+  }
+
   async getAdminByEmail(email: string): Promise<Admin | null> {
     return await this.adminRepository.findOne({
       where: { email: email },
@@ -44,6 +50,18 @@ export class AdminService {
       return null;
     }
     this.adminRepository.merge(admin, adminData);
+    return await this.adminRepository.save(admin);
+  }
+
+  async updatePasswordById(
+    id: number,
+    password: string
+  ): Promise<Admin | null> {
+    const admin = await this.adminRepository.findOneBy({ id });
+    if (!admin) {
+      return null;
+    }
+    admin.password = password;
     return await this.adminRepository.save(admin);
   }
 

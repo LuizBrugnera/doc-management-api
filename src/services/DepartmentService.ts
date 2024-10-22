@@ -31,7 +31,6 @@ export class DepartmentService {
   async getDepartmentById(id: number): Promise<Department | null> {
     return await this.departmentRepository.findOne({
       where: { id },
-      relations: ["foldersAccess", "logs"],
     });
   }
 
@@ -58,6 +57,18 @@ export class DepartmentService {
       return null;
     }
     this.departmentRepository.merge(department, departmentData);
+    return await this.departmentRepository.save(department);
+  }
+
+  async updatePasswordById(
+    id: number,
+    password: string
+  ): Promise<Department | null> {
+    const department = await this.departmentRepository.findOneBy({ id });
+    if (!department) {
+      return null;
+    }
+    department.password = password;
     return await this.departmentRepository.save(department);
   }
 
