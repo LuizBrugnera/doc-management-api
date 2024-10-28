@@ -13,7 +13,7 @@ export class UserService {
 
   async getAllUsers(): Promise<User[]> {
     return await this.userRepository.find({
-      relations: ["documents", "emailUserDepartments"],
+      relations: ["emailUserDepartments"],
       select: {
         cnpj: true,
         rg: true,
@@ -25,8 +25,8 @@ export class UserService {
         mainEmail: true,
         created_at: true,
         updated_at: true,
-        documents: true,
         emailUserDepartments: true,
+        documents: false,
         password: false,
         notifications: false,
       },

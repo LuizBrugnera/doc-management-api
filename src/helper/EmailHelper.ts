@@ -8,10 +8,11 @@ interface EmailOptions {
   subject: string;
   text?: string;
   html?: string;
+  attachments?: any[];
 }
 
 export const EmailHelper = {
-  sendMail: async (options: EmailOptions): Promise<void> => {
+  sendMail: async (options: EmailOptions): Promise<boolean> => {
     try {
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -27,13 +28,18 @@ export const EmailHelper = {
         subject: options.subject,
         text: options.text,
         html: options.html,
+        attachments: options.attachments,
       };
 
-      await transporter.sendMail(mailOptions);
+      const res = await transporter.sendMail(mailOptions);
+      if (res.rejected.length > 0) {
+        console.error("Email foi rejeitado:", res.rejected);
+        return false;
+      }
       console.log("Email sent successfully!");
+      return true;
     } catch (error) {
-      console.error("Error sending email:", error);
-      throw error;
+      return false;
     }
   },
 };

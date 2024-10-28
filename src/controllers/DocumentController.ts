@@ -10,8 +10,10 @@ import { UserService } from "../services/UserService";
 import { DepartmentService } from "../services/DepartmentService";
 import { AdminService } from "../services/AdminService";
 import { AdminLogService } from "../services/AdminLogService";
-import { Document } from "typeorm";
 import { FolderAccessService } from "../services/FolderAccessService";
+import { EmailHelper } from "../helper/EmailHelper";
+import { sendDocumentsMailOptions } from "../helper/EmailData";
+import { Log } from "../entities/Log";
 
 export class DocumentController {
   private userService = new UserService();
@@ -147,12 +149,14 @@ export class DocumentController {
     return userId;
   }
 
-  private isAuthorized(userId: number, document: any, req: Request): boolean {
+  private isAuthorized(userId: number, document: any, req: Request) {
     return (
       document.userId === userId ||
       req.user?.role === "admin" ||
       (req.user?.role === "department" &&
-        req.user?.department === document.department)
+        req.user.folderAccess?.some(
+          (folder) => folder.foldername === document.folder
+        ))
     );
   }
 
@@ -160,6 +164,15 @@ export class DocumentController {
     return Object.keys(DocumentController.folderDisplayNames).find(
       (key) => DocumentController.folderDisplayNames[key] === displayName
     );
+  }
+
+  private getFiveRandomNumbers(): number[] {
+    const numeros = [];
+    for (let i = 0; i < 5; i++) {
+      const numeroAleatorio = Math.floor(Math.random() * 10); // Gera números entre 0 e 9
+      numeros.push(numeroAleatorio);
+    }
+    return numeros;
   }
 
   private insertDocumentsIntoStructure(
@@ -241,6 +254,45 @@ export class DocumentController {
     } catch (error) {
       return null;
     }
+  };
+
+  private getLogToUser = async (logId: number, role: string) => {
+    if (role === "department") {
+      const log = await this.logService.getLogById(logId);
+      return log;
+    } else if (role === "admin") {
+      const log = await this.adminLogService.getAdminLogById(logId);
+      return log;
+    }
+    return null;
+  };
+
+  private updateLogToUser = async (
+    logId: number,
+    role: string,
+    logData: Partial<Log>
+  ) => {
+    if (role === "department") {
+      const log = await this.logService.getLogById(logId);
+      if (!log) {
+        return null;
+      }
+      const newLog = { ...log, ...logData };
+      const updatedLog = await this.logService.updateLog(logId, newLog);
+      return updatedLog;
+    } else if (role === "admin") {
+      const log = await this.adminLogService.getAdminLogById(logId);
+      if (!log) {
+        return null;
+      }
+      const newLog = { ...log, ...logData };
+      const updatedLog = await this.adminLogService.updateAdminLog(
+        logId,
+        newLog
+      );
+      return updatedLog;
+    }
+    return null;
   };
 
   public getAllDocuments = async (
@@ -341,9 +393,7 @@ export class DocumentController {
       try {
         await fs.promises.access(filePath, fs.constants.F_OK);
         await fs.promises.unlink(filePath);
-        console.log(`Arquivo ${filePath} excluído com sucesso.`);
       } catch (err) {
-        console.error(`Erro ao excluir o arquivo ${filePath}:`, err);
         throw new Error("Erro ao excluir o arquivo");
       }
 
@@ -640,7 +690,18 @@ export class DocumentController {
         return;
       }
 
-      await this.documentService.createDocument({
+      const documentExists = await this.documentService.getDocumentByName(
+        documentName
+      );
+
+      const invisible =
+        documentExists &&
+        documentExists.user.id === user.id &&
+        documentExists.folder === folderKey
+          ? true
+          : false;
+
+      const documentCreated = await this.documentService.createDocument({
         name: documentName,
         type,
         description,
@@ -648,27 +709,201 @@ export class DocumentController {
         user,
         uuid,
         folder: folderKey,
+        isInvisible: invisible,
       });
 
-      await this.notificationService.createNotification({
-        title: "Novo documento disponível",
-        user,
-        description: `Novo documento ${name} na pasta ${folder} recebido e pronto para download`,
-      });
-
-      if (req.user?.id && req.user.role) {
-        this.assignLogToUser({
-          userId: req.user.id,
-          action: "Documento adicionado",
-          date: new Date(),
-          description: `Novo documento ${name} na pasta ${folder} adicionado e pronto para download`,
-          role: req.user.role,
-          state: "",
+      if (!invisible) {
+        await this.notificationService.createNotification({
+          title: "Novo documento disponível",
+          user,
+          description: `Novo documento ${name} na pasta ${folder} recebido e pronto para download`,
         });
       }
+      if (req.user?.id && req.user.role) {
+        if (invisible) {
+          this.assignLogToUser({
+            userId: req.user.id,
+            action: "Documento com mesmo nome ja existe",
+            date: new Date(),
+            description: `O Documento ${name} na pasta ${folder} do usuario ${user.name} no id {${documentCreated.id}} ja existe.`,
+            role: req.user.role,
+            state: "conflict",
+          });
+        } else {
+          this.assignLogToUser({
+            userId: req.user.id,
+            action: "Documento adicionado",
+            date: new Date(),
+            description: `Novo documento ${name} na pasta ${folder} adicionado e pronto para download`,
+            role: req.user.role,
+            state: "success",
+          });
+        }
+      }
+      if (invisible) {
+        res.status(409).json({
+          message: `Conflito, o nome ${file.originalname} para o usuario ${userId} já existe.`,
+        });
+        return;
+      }
+      try {
+        const type = path.extname(uuid);
+        const filePath = path.join(
+          __dirname,
+          `../../documents/${user.id}/${uuid}`
+        );
+
+        const pdfContent = fs.readFileSync(filePath);
+
+        EmailHelper.sendMail({
+          to: user.mainEmail,
+          subject: "Documentos para download",
+          text: sendDocumentsMailOptions.text(),
+          html: sendDocumentsMailOptions.html(user.name),
+          attachments: sendDocumentsMailOptions.attachments(
+            documentName,
+            type,
+            pdfContent
+          ),
+        }).then((result) => {
+          if (req.user?.id && req.user.role) {
+            if (result) {
+              this.assignLogToUser({
+                userId: req.user.id,
+                action: "Email enviado com Sucesso",
+                date: new Date(),
+                description: `Sucesso ao enviar o email para ${user.mainEmail} com o documento ${documentName}`,
+                role: req.user.role,
+                state: "success",
+              });
+            } else {
+              if (req.user?.id && req.user.role) {
+                this.assignLogToUser({
+                  userId: req.user.id,
+                  action: "Falha ao enviar o email",
+                  date: new Date(),
+                  description: `Falha ao enviar o email para o email ${user.mainEmail},  usuario - ${user.name}, com o documento - ${documentName}, u ID{${user.id}} c ID {${documentCreated.id}}`,
+                  role: req.user.role,
+                  state: "failure",
+                });
+              }
+            }
+          }
+        });
+      } catch (error) {}
       res.status(200).json({
         message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
       });
+    } catch (error: any) {
+      this.handleError(res, error, "Erro ao fazer upload do arquivo");
+    }
+  };
+
+  public trySendEmail = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const documentId = parseInt(req.params.documentId);
+      const logId = parseInt(req.params.logId);
+      const userId = this.getUserId(req);
+
+      if (!userId) {
+        res.status(400).json({ message: "Usuário não encontrado" });
+        return;
+      }
+
+      const documentExists = await this.documentService.getDocumentById(
+        documentId
+      );
+
+      if (!documentExists) {
+        res.status(404).json({ message: "Documento não encontrado" });
+        return;
+      }
+    } catch (error: any) {
+      this.handleError(res, error, "Erro ao fazer upload do arquivo");
+    }
+  };
+
+  public holdDocument = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const documentId = parseInt(req.params.documentId);
+      const logId = parseInt(req.params.logId);
+
+      const documentExists = await this.documentService.getDocumentById(
+        documentId
+      );
+
+      if (!documentExists) {
+        res.status(404).json({ message: "Documento não encontrado" });
+        return;
+      }
+
+      documentExists.isInvisible = false;
+
+      const documentUpdated = await this.documentService.updateDocument(
+        documentId,
+        documentExists
+      );
+
+      if (!documentUpdated) {
+        res.status(404).json({ message: "Documento não encontrado" });
+        return;
+      }
+
+      const newData = {
+        action: "Documento mantido",
+        state: "success",
+        description: `Documento ${documentId} mantido com sucesso`,
+      };
+
+      const updatedLog = await this.updateLogToUser(
+        logId,
+        req.user?.role!,
+        newData
+      );
+
+      if (updatedLog) {
+        res.json(documentUpdated);
+      } else {
+        res.status(404).json({ message: "Log não encontrado" });
+      }
+    } catch (error: any) {
+      this.handleError(res, error, "Erro ao fazer upload do arquivo");
+    }
+  };
+
+  public discardDocument = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const documentId = parseInt(req.params.documentId);
+      const logId = parseInt(req.params.logId);
+      const documentExists = await this.documentService.getDocumentById(
+        documentId
+      );
+
+      if (!documentExists) {
+        res.status(404).json({ message: "Documento não encontrado" });
+        return;
+      }
+
+      const deletedDocument = await this.documentService.deleteDocument(
+        documentId
+      );
+
+      if (!deletedDocument) {
+        res.status(404).json({ message: "Documento não encontrado" });
+        return;
+      }
+
+      const newData = {
+        action: "Documento descartado",
+        state: "success",
+        description: `Documento ${documentId} descartado com sucesso`,
+      };
+
+      const sa = await this.updateLogToUser(logId, req.user?.role!, newData);
+      res.json(deletedDocument);
     } catch (error: any) {
       this.handleError(res, error, "Erro ao fazer upload do arquivo");
     }

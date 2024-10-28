@@ -31,6 +31,7 @@ export class DepartmentService {
   async getDepartmentById(id: number): Promise<Department | null> {
     return await this.departmentRepository.findOne({
       where: { id },
+      relations: ["logs"],
     });
   }
 

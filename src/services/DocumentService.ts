@@ -16,6 +16,13 @@ export class DocumentService {
       relations: ["user"],
     });
   }
+
+  async getDocumentByName(name: string): Promise<Document | null> {
+    return await this.documentRepository.findOne({
+      where: { name },
+      relations: ["user"],
+    });
+  }
   async getDocumentsByUserId(userId: number): Promise<Document[]> {
     return await this.documentRepository.find({
       where: { user: { id: userId } },
@@ -56,6 +63,7 @@ export class DocumentService {
           id: userId,
         },
         folder,
+        isInvisible: false,
       },
       order: { date: "DESC" },
     });

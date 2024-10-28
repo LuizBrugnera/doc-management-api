@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
+import { AuthService } from "../services/AuthService";
 
 export class UserController {
   private userService = new UserService();
+  private authService = new AuthService();
 
   public getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -47,11 +49,26 @@ export class UserController {
 
       const userData = req.body;
 
-      const user = await this.userService.updateUser(id, userData);
+      const user = await this.userService.getUserById(id);
+
       if (!user) {
         res.status(404).json({ message: "Usuário não encontrado" });
+        return;
       }
-      res.json(user);
+
+      if (req.user?.role === "admin" && userData.password) {
+        userData.password = await this.authService.hashPassword(
+          userData.password
+        );
+      } else {
+        userData.password = user.password;
+      }
+
+      const userUpdated = await this.userService.updateUser(id, userData);
+      if (!userUpdated) {
+        res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      res.json(userUpdated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

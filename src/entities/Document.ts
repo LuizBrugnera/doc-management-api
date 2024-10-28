@@ -31,6 +31,9 @@ export class Document {
   @Column()
   folder: string;
 
+  @Column({ default: false })
+  isInvisible: boolean;
+
   @ManyToOne(() => User, (user) => user.documents, {
     onDelete: "CASCADE",
   })

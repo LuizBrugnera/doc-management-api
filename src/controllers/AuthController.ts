@@ -448,6 +448,7 @@ export class AuthController {
         return;
       }
       const userInfo = await this.roleGetter[user.role](user.id);
+      userInfo.password = "";
       res.status(200).json(userInfo);
     } catch (error: any) {
       res.status(500).json({ message: error.message });

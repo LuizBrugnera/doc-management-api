@@ -27,6 +27,7 @@ export class AdminService {
   async getAdminByIdWithPassword(id: number): Promise<Admin | null> {
     return await this.adminRepository.findOne({
       where: { id },
+      relations: ["adminLogs"],
     });
   }
 

@@ -61,4 +61,22 @@ router.delete(
   authMiddleware,
   documentController.deleteDocument
 );
+
+router.delete(
+  "/discart/:documentId/:logId",
+  authMiddleware,
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin", "department"]);
+  },
+  documentController.discardDocument
+);
+
+router.post(
+  "/hold/:documentId/:logId",
+  authMiddleware,
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin", "department"]);
+  },
+  documentController.holdDocument
+);
 export default router;

@@ -3,6 +3,33 @@ export const resetTokens = new Map<
   string,
   { email: string; expiresAt: Date }
 >();
+
+export const sendDocumentsMailOptions = {
+  text: () => `Olá,
+  Recebemos um novo documento clique aqui para baixá-lo!
+  Atenciosamente,
+`,
+
+  html: (username: string) => `
+    <div style="font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+      <h2 style="color: #2c3e50; text-align: center;">Novo Documento</h2>
+      <p style="font-size: 16px; color: #555;">Olá,</p>
+      <p style="font-size: 16px; color: #555;">Você recebeu um novo documento!</p>
+      <br/>
+      <p style="font-size: 16px; color: #555;">Atenciosamente,</p>
+      <p style="font-size: 16px; color: #555; font-weight: bold;">${username}</p>
+      <hr style="border: none; height: 1px; background-color: #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #999; text-align: center;">© 2024 Document Viewer. Todos os direitos reservados.</p>
+    </div>`,
+
+  attachments: (filename: string, type: string, pdfContent: any) => [
+    {
+      filename: `${filename}.${type}`,
+      content: pdfContent,
+    },
+  ],
+};
+
 export const resetCodeMailOptions = {
   text: (code: string) => `Olá,
   
