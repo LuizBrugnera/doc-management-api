@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { AdminService } from "../services/AdminService";
+import { AuthService } from "../services/AuthService";
 
 export class AdminController {
   private adminService = new AdminService();
+  private authService = new AuthService();
 
   public getAllAdmins = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -29,6 +31,9 @@ export class AdminController {
   public createAdmin = async (req: Request, res: Response): Promise<void> => {
     try {
       const adminData = req.body;
+      adminData.password = await this.authService.hashPassword(
+        adminData.password
+      );
       const admin = await this.adminService.createAdmin(adminData);
       res.status(201).json(admin);
     } catch (error: any) {
