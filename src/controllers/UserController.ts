@@ -77,6 +77,12 @@ export class UserController {
   public deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
+
+      if (id !== req.user?.id && req.user?.role !== "admin") {
+        res.status(401).json({ message: "Não Autorizado!" });
+        return;
+      }
+
       const success = await this.userService.deleteUser(id);
       if (!success) {
         res.status(404).json({ message: "Usuário não encontrado" });
