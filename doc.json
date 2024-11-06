@@ -1,0 +1,1435 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Gerenciamento de Documentos",
+    "description": "Documentação completa da API para gerenciamento de documentos, usuários, logs, notificações, departamentos e autenticação.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Base URL da API"
+    }
+  ],
+  "paths": {
+    "/admin-logs": {
+      "get": {
+        "summary": "Lista todos os logs de administrador",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de logs de administrador",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AdminLog" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo log de administrador",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminLogInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Log de administrador criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminLog" }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/admin-logs/{id}": {
+      "get": {
+        "summary": "Busca um log de administrador pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do log de administrador"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do log de administrador",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminLog" }
+              }
+            }
+          },
+          "404": { "description": "Log de administrador não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um log de administrador pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do log de administrador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminLogInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Log de administrador atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminLog" }
+              }
+            }
+          },
+          "404": { "description": "Log de administrador não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/logs": {
+      "get": {
+        "summary": "Lista todos os logs",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Log" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo log",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LogInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Log criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Log" }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/logs/{id}": {
+      "get": {
+        "summary": "Busca um log pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do log"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do log",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Log" }
+              }
+            }
+          },
+          "404": { "description": "Log não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um log pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do log"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LogInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Log atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Log" }
+              }
+            }
+          },
+          "404": { "description": "Log não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "delete": {
+        "summary": "Deleta um log pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do log"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Log deletado com sucesso" },
+          "404": { "description": "Log não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/notifications/read/{id}": {
+      "put": {
+        "summary": "Marca uma notificação como lida",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID da notificação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notificação marcada como lida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Notification" }
+              }
+            }
+          },
+          "404": { "description": "Notificação não encontrada" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/notifications/user": {
+      "get": {
+        "summary": "Retorna as notificações do usuário autenticado",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de notificações do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Notification" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/departments": {
+      "get": {
+        "summary": "Lista todos os departamentos",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de departamentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Department" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo departamento",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DepartmentInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Departamento criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/departments/{id}": {
+      "get": {
+        "summary": "Busca um departamento pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do departamento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do departamento",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "404": { "description": "Departamento não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um departamento pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do departamento"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DepartmentInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Departamento atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Department" }
+              }
+            }
+          },
+          "404": { "description": "Departamento não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "delete": {
+        "summary": "Deleta um departamento pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do departamento"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Departamento deletado com sucesso" },
+          "404": { "description": "Departamento não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/departments/by-department/{department}": {
+      "get": {
+        "summary": "Busca departamentos pelo nome do departamento",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "department",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Nome do departamento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de departamentos filtrados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Department" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/admins/{id}": {
+      "put": {
+        "summary": "Atualiza um administrador pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID do administrador"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Administrador atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Admin" }
+              }
+            }
+          },
+          "404": { "description": "Administrador não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/auth/user/register": {
+      "post": {
+        "summary": "Registra um novo usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserRegister" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuário registrado com sucesso" },
+          "400": { "description": "Email já cadastrado" }
+        }
+      }
+    },
+    "/auth/user/login": {
+      "post": {
+        "summary": "Login de usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserLogin" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Token de autenticação" },
+          "400": { "description": "Email ou senha incorretos" }
+        }
+      }
+    },
+    "/auth/admin/register": {
+      "post": {
+        "summary": "Registra um novo administrador",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminRegister" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Administrador registrado com sucesso" },
+          "400": { "description": "Email já cadastrado" }
+        }
+      }
+    },
+    "/auth/admin/login": {
+      "post": {
+        "summary": "Login de administrador",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminLogin" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Token de autenticação" },
+          "400": { "description": "Email ou senha incorretos" }
+        }
+      }
+    },
+    "/auth/generate-code": {
+      "post": {
+        "summary": "Gera código de redefinição de senha",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email do usuário"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Código de redefinição enviado" },
+          "400": { "description": "Email não cadastrado" }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Lista todos os usuários",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "500": { "description": "Erro no servidor" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Busca um usuário pelo ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do usuário",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "description": "Usuário não encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um usuário pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "description": "Usuário não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      },
+      "delete": {
+        "summary": "Deleta um usuário pelo ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Usuário deletado com sucesso" },
+          "404": { "description": "Usuário não encontrado" },
+          "401": { "description": "Não autorizado" }
+        }
+      }
+    },
+    "/upload/file/{userId}": {
+      "post": {
+        "summary": "Upload de Documento",
+        "description": "Realiza o upload de um documento para o usuário especificado.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do usuário que receberá o documento"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Arquivo do documento a ser enviado"
+                  }
+                },
+                "required": ["document"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Documento enviado com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/upload/auto-assign": {
+      "post": {
+        "summary": "Upload de Documento com Atribuição Automática",
+        "description": "Realiza o upload de um documento e o atribui automaticamente conforme regras do sistema.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Arquivo do documento a ser enviado"
+                  }
+                },
+                "required": ["document"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Documento enviado e atribuído com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/download/{documentId}/{userId}": {
+      "get": {
+        "summary": "Download de Documento",
+        "description": "Realiza o download de um documento específico.",
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do documento a ser baixado"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do usuário solicitante (opcional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download do documento realizado com sucesso",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Documentos do Usuário",
+        "description": "Obtém todos os documentos pertencentes ao usuário autenticado.",
+        "responses": {
+          "200": {
+            "description": "Lista de documentos do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/department": {
+      "get": {
+        "summary": "Documentos do Departamento",
+        "description": "Obtém documentos acessíveis ao departamento do usuário autenticado.",
+        "responses": {
+          "200": {
+            "description": "Lista de documentos do departamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/documents/folder-format": {
+      "get": {
+        "summary": "Documentos em Formato de Pasta",
+        "description": "Obtém documentos do usuário no formato de pasta.",
+        "responses": {
+          "200": {
+            "description": "Documentos no formato de pasta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/documents/": {
+      "get": {
+        "summary": "Todos os Documentos",
+        "description": "Obtém todos os documentos no sistema (admin somente).",
+        "responses": {
+          "200": {
+            "description": "Lista de todos os documentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/documents/{documentId}": {
+      "delete": {
+        "summary": "Deleta Documento",
+        "description": "Deleta um documento específico.",
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do documento a ser deletado"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Documento deletado com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/documents/discart/{documentId}/{logId}": {
+      "delete": {
+        "summary": "Descarta Documento",
+        "description": "Descarta um documento específico, registrando o descarte.",
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do documento a ser descartado"
+          },
+          {
+            "name": "logId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do log de descarte"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Documento descartado com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/documents/hold/{documentId}/{logId}": {
+      "post": {
+        "summary": "Mantém Documento",
+        "description": "Mantém um documento específico, evitando alterações.",
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do documento a ser mantido"
+          },
+          {
+            "name": "logId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID do log associado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documento marcado como mantido com sucesso"
+          },
+          "403": {
+            "description": "Acesso negado"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID do log de administrador"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição do log de administrador"
+          },
+          "action": { "type": "string", "description": "Ação realizada" },
+          "state": {
+            "type": "string",
+            "description": "Estado associado à ação"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da ação"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "AdminLogInput": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Descrição do log de administrador"
+          },
+          "action": { "type": "string", "description": "Ação realizada" },
+          "state": {
+            "type": "string",
+            "description": "Estado associado à ação"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da ação"
+          }
+        },
+        "required": ["description", "action", "state", "date"]
+      },
+      "Log": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "ID do log" },
+          "description": {
+            "type": "string",
+            "description": "Descrição do log"
+          },
+          "action": { "type": "string", "description": "Ação realizada" },
+          "state": {
+            "type": "string",
+            "description": "Estado associado à ação"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da ação"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "LogInput": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Descrição do log"
+          },
+          "action": { "type": "string", "description": "Ação realizada" },
+          "state": {
+            "type": "string",
+            "description": "Estado associado à ação"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da ação"
+          }
+        },
+        "required": ["description", "action", "state", "date"]
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "ID da notificação" },
+          "title": { "type": "string", "description": "Título da notificação" },
+          "description": {
+            "type": "string",
+            "description": "Descrição da notificação"
+          },
+          "viewed": {
+            "type": "boolean",
+            "description": "Indica se a notificação foi visualizada"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da notificação"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "Department": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "ID do departamento" },
+          "name": { "type": "string", "description": "Nome do departamento" },
+          "email": { "type": "string", "description": "Email do departamento" },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do departamento"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do departamento"
+          },
+          "department": { "type": "string", "description": "Nome do setor" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "DepartmentInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Nome do departamento" },
+          "email": { "type": "string", "description": "Email do departamento" },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do departamento"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do departamento"
+          },
+          "department": { "type": "string", "description": "Nome do setor" }
+        },
+        "required": ["name", "email", "password", "department"]
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "ID do administrador" },
+          "name": { "type": "string", "description": "Nome do administrador" },
+          "email": {
+            "type": "string",
+            "description": "Email do administrador"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do administrador"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do administrador"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "AdminInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Nome do administrador" },
+          "email": {
+            "type": "string",
+            "description": "Email do administrador"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do administrador"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do administrador"
+          }
+        },
+        "required": ["name", "email", "password"]
+      },
+      "UserRegister": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Nome do usuário" },
+          "emails": {
+            "type": "array",
+            "items": { "type": "string", "description": "Email do usuário" }
+          },
+          "cpf": { "type": "string", "description": "CPF do usuário" },
+          "password": { "type": "string", "description": "Senha do usuário" }
+        },
+        "required": ["name", "emails", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "description": "Email do usuário" },
+          "password": { "type": "string", "description": "Senha do usuário" }
+        },
+        "required": ["email", "password"]
+      },
+      "AdminRegister": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Nome do administrador" },
+          "email": {
+            "type": "string",
+            "description": "Email do administrador"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do administrador"
+          }
+        },
+        "required": ["name", "email", "password"]
+      },
+      "AdminLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email do administrador"
+          },
+          "password": {
+            "type": "string",
+            "description": "Senha do administrador"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "ID do usuário" },
+          "name": { "type": "string", "description": "Nome do usuário" },
+          "mainEmail": {
+            "type": "string",
+            "description": "Email principal do usuário"
+          },
+          "cnpj": {
+            "type": "string",
+            "nullable": true,
+            "description": "CNPJ do usuário"
+          },
+          "rg": {
+            "type": "string",
+            "nullable": true,
+            "description": "RG do usuário"
+          },
+          "cpf": {
+            "type": "string",
+            "nullable": true,
+            "description": "CPF do usuário"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do usuário"
+          },
+          "cod": {
+            "type": "string",
+            "nullable": true,
+            "description": "Código do usuário"
+          },
+          "password": { "type": "string", "description": "Senha do usuário" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Nome do usuário" },
+          "mainEmail": {
+            "type": "string",
+            "description": "Email principal do usuário"
+          },
+          "cnpj": {
+            "type": "string",
+            "nullable": true,
+            "description": "CNPJ do usuário"
+          },
+          "rg": {
+            "type": "string",
+            "nullable": true,
+            "description": "RG do usuário"
+          },
+          "cpf": {
+            "type": "string",
+            "nullable": true,
+            "description": "CPF do usuário"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telefone do usuário"
+          },
+          "cod": {
+            "type": "string",
+            "nullable": true,
+            "description": "Código do usuário"
+          },
+          "password": { "type": "string", "description": "Senha do usuário" }
+        },
+        "required": ["name", "mainEmail", "password"]
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID único do documento"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID do usuário proprietário do documento"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do documento"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL do documento para download"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação do documento"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

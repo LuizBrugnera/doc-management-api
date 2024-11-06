@@ -7,13 +7,12 @@ export class LogService {
   private departmentRepository = AppDataSource.getRepository(Department);
 
   async getAllLogs(): Promise<Log[]> {
-    return await this.logRepository.find({ relations: ["department"] });
+    return await this.logRepository.find();
   }
 
   async getLogById(id: number): Promise<Log | null> {
     return await this.logRepository.findOne({
       where: { id },
-      relations: ["department"],
     });
   }
 

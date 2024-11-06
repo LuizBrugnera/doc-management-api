@@ -7,13 +7,12 @@ export class AdminLogService {
   private adminRepository = AppDataSource.getRepository(Admin);
 
   async getAllAdminLogs(): Promise<AdminLog[]> {
-    return await this.adminLogRepository.find({ relations: ["admin"] });
+    return await this.adminLogRepository.find();
   }
 
   async getAdminLogById(id: number): Promise<AdminLog | null> {
     return await this.adminLogRepository.findOne({
       where: { id },
-      relations: ["admin"],
     });
   }
 

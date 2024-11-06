@@ -13,6 +13,14 @@ app.use(urlencoded({ extended: true }));
 
 app.use("/api/v1", routes);
 
+app.get("/docs", (req, res) => {
+  res.sendFile(process.cwd() + "/swagger.html");
+});
+
+app.get("/doc.json", (req, res) => {
+  res.sendFile(process.cwd() + "/doc.json");
+});
+
 app.use(errorMiddleware);
 
 export default app;

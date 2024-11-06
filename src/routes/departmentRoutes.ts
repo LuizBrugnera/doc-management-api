@@ -14,9 +14,31 @@ router.get(
   },
   departmentController.getAllDepartments
 );
-router.get("/:id", authMiddleware, departmentController.getDepartmentById);
-router.post("/", authMiddleware, departmentController.createDepartment);
-router.put("/:id", authMiddleware, departmentController.updateDepartment);
+router.get(
+  "/:id",
+  authMiddleware,
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin", "department"]);
+  },
+  departmentController.getDepartmentById
+);
+router.post(
+  "/",
+  authMiddleware,
+  authMiddleware,
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin"]);
+  },
+  departmentController.createDepartment
+);
+router.put(
+  "/:id",
+  authMiddleware,
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin", "department"]);
+  },
+  departmentController.updateDepartment
+);
 router.delete(
   "/:id",
   authMiddleware,
@@ -27,6 +49,9 @@ router.delete(
 );
 router.get(
   "/by-department/:department",
+  (req, res, next) => {
+    roleAuthMiddleware(req, res, next, ["admin", "department"]);
+  },
   departmentController.getDepartmentsByDepartment
 );
 export default router;
