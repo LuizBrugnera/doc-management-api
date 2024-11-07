@@ -4,6 +4,7 @@ import fs from "fs";
 import { UserService } from "../services/UserService";
 import { AuthService } from "../services/AuthService";
 import { AppDataSource } from "../data-source";
+import { EmailUserDepartmentService } from "../services/EmailUserDepartmentService";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ class UserUpdater {
   private API_SECRET: string;
   private userService: UserService;
   private authService: AuthService;
+  private emailUserDepartmentService: EmailUserDepartmentService;
   private logFile: string;
 
   constructor() {
@@ -21,6 +23,7 @@ class UserUpdater {
     this.API_SECRET = process.env.API_GESTAO_SECRET || "";
     this.userService = new UserService();
     this.authService = new AuthService();
+    this.emailUserDepartmentService = new EmailUserDepartmentService();
     this.logFile = "missing_email.log";
   }
 
@@ -86,7 +89,8 @@ class UserUpdater {
   }
 
   private async processUser(userData: any): Promise<void> {
-    const { id, razao_social, email, cpf, rg, cnpj, celular } = userData;
+    const { id, razao_social, email, cpf, rg, cnpj, celular, contatos } =
+      userData;
 
     if (!razao_social) {
       console.warn(`User with ID ${id} has invalid 'razao_social'. Skipping.`);
@@ -113,7 +117,7 @@ class UserUpdater {
 
       if (!userExists) {
         const hashedPassword = await this.authService.hashPassword(password);
-        await this.userService.createUser({
+        const createdUser = await this.userService.createUser({
           name: this.normalizeText(razao_social),
           cod: id,
           mainEmail: userEmail,
@@ -123,9 +127,41 @@ class UserUpdater {
           password: hashedPassword,
           phone: celular,
         });
+
         console.log(`User with ID ${id} created successfully.`);
+
+        if (contatos && contatos.length > 0 && false) {
+          console.log(contatos);
+          contatos.forEach((contact: { contato: any }) => {
+            this.emailUserDepartmentService.createAssociation({
+              user: createdUser,
+              email: contact.contato.contato,
+              department: contact.contato.nome_tipo,
+            });
+          });
+        }
       } else {
         console.log(`User with ID ${id} already exists. Skipping.`);
+
+        if (contatos && contatos.length > 0) {
+          const contactsExists =
+            await this.emailUserDepartmentService.getAssociationByUserId(
+              userExists.id
+            );
+
+          contatos.forEach(async (contact: { contato: any }) => {
+            const contactExists = contactsExists.find(
+              (contactExists) => contactExists.email === contact.contato.contato
+            );
+            if (!contactExists) {
+              this.emailUserDepartmentService.createAssociation({
+                user: userExists,
+                email: contact.contato.contato,
+                department: contact.contato.nome_tipo,
+              });
+            }
+          });
+        }
       }
     } catch (error) {
       console.error(`Error processing user with ID ${id}:`, error);

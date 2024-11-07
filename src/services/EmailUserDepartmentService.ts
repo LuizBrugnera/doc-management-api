@@ -20,6 +20,12 @@ export class EmailUserDepartmentService {
     });
   }
 
+  async getAssociationByUserId(userId: number): Promise<EmailUserDepartment[]> {
+    return await this.emailUserDepartmentRepository.find({
+      where: { user: { id: userId } },
+    });
+  }
+
   async createAssociation(
     data: Partial<EmailUserDepartment>
   ): Promise<EmailUserDepartment> {
