@@ -31,6 +31,11 @@ export class Department {
   @Column()
   department: string;
 
+  @Column("text", {
+    nullable: true,
+  })
+  emailTemplate: string;
+
   @OneToMany(() => FolderAccess, (folderAccess) => folderAccess.department)
   foldersAccess: FolderAccess[];
 

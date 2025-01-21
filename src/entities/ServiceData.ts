@@ -2,38 +2,35 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { AdminLog } from "./AdminLog";
 
 @Entity()
-export class Admin {
+export class ServiceData {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  name: string;
+  cod: string;
 
   @Column()
-  email: string;
+  name: string;
 
   @Column({
     nullable: true,
   })
-  phone: string;
+  sellValue: string;
 
   @Column("text", {
     nullable: true,
   })
-  emailTemplate: string;
+  description: string;
 
-  @Column()
-  password: string;
-
-  @OneToMany(() => AdminLog, (adminLog) => adminLog.admin)
-  adminLogs: AdminLog[];
+  @Column({
+    nullable: true,
+  })
+  duration: string;
 
   @CreateDateColumn()
   created_at: Date;

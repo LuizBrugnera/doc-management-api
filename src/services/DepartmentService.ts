@@ -18,6 +18,7 @@ export class DepartmentService {
         updated_at: true,
         foldersAccess: true,
         logs: true,
+        emailTemplate: true,
       },
     });
   }

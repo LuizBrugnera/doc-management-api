@@ -12,8 +12,12 @@ import { AdminService } from "../services/AdminService";
 import { AdminLogService } from "../services/AdminLogService";
 import { FolderAccessService } from "../services/FolderAccessService";
 import { EmailHelper } from "../helper/EmailHelper";
-import { sendDocumentsMailOptions } from "../helper/EmailData";
+import {
+  sendDocumentsMailDinamicTemplateOptions,
+  sendDocumentsMailOptions,
+} from "../helper/EmailData";
 import { Log } from "../entities/Log";
+import { EmailUserDepartmentService } from "../services/EmailUserDepartmentService";
 
 export class DocumentController {
   private userService = new UserService();
@@ -24,6 +28,7 @@ export class DocumentController {
   private logService = new LogService();
   private adminLogService = new AdminLogService();
   private folderAccessService = new FolderAccessService();
+  private emailUserDepartmentService = new EmailUserDepartmentService();
 
   private static readonly folderNames = [
     "boletos",
@@ -263,6 +268,23 @@ export class DocumentController {
     } else if (role === "admin") {
       const log = await this.adminLogService.getAdminLogById(logId);
       return log;
+    }
+    return null;
+  };
+
+  private getDepOrAdminById = async (id: number, role: string) => {
+    if (role === "department") {
+      const department = await this.departmentService.getDepartmentById(id);
+      if (!department) {
+        return null;
+      }
+      return department;
+    } else if (role === "admin") {
+      const admin = await this.adminService.getAdminById(id);
+      if (!admin) {
+        return null;
+      }
+      return admin;
     }
     return null;
   };
@@ -746,6 +768,10 @@ export class DocumentController {
         });
         return;
       }
+      const userEmails =
+        await this.emailUserDepartmentService.getAssociationByUserId(user.id);
+
+      const userEmailsText = userEmails.map((email) => email.email).join(", ");
       try {
         const type = path.extname(uuid);
         const filePath = path.join(
@@ -755,11 +781,22 @@ export class DocumentController {
 
         const pdfContent = fs.readFileSync(filePath);
 
+        const depOrAdmin = await this.getDepOrAdminById(
+          user.id,
+          req.user?.role!
+        );
+
+        const template = depOrAdmin?.emailTemplate || "Olá,";
+
         EmailHelper.sendMail({
-          to: user.mainEmail,
+          to: user.mainEmail + "," + userEmailsText,
           subject: "Documentos para download",
-          text: sendDocumentsMailOptions.text(),
-          html: sendDocumentsMailOptions.html(user.name),
+          text: sendDocumentsMailDinamicTemplateOptions.text(template),
+          html: sendDocumentsMailDinamicTemplateOptions.html(
+            user.name,
+            folder,
+            template
+          ),
           attachments: sendDocumentsMailOptions.attachments(
             documentName,
             type,
@@ -772,7 +809,7 @@ export class DocumentController {
                 userId: req.user.id,
                 action: "Email enviado com Sucesso",
                 date: new Date(),
-                description: `Sucesso ao enviar o email para ${user.mainEmail} com o documento ${documentName}`,
+                description: `Sucesso ao enviar o email para ${userEmailsText} com o documento ${documentName}`,
                 role: req.user.role,
                 state: "success",
               });
@@ -782,7 +819,7 @@ export class DocumentController {
                   userId: req.user.id,
                   action: "Falha ao enviar o email",
                   date: new Date(),
-                  description: `Falha ao enviar o email para o email ${user.mainEmail},  usuario - ${user.name}, com o documento - ${documentName}, u ID{${user.id}} c ID {${documentCreated.id}}`,
+                  description: `Falha ao enviar o email para o email ${userEmailsText},  usuario - ${user.name}, com o documento - ${documentName}, u ID{${user.id}} c ID {${documentCreated.id}}`,
                   role: req.user.role,
                   state: "failure",
                 });

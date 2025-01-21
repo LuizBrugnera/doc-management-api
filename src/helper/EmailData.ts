@@ -30,6 +30,46 @@ export const sendDocumentsMailOptions = {
   ],
 };
 
+export const sendDocumentsMailDinamicTemplateOptions = {
+  text: (template = "") => `Olá,
+  Recebemos um novo documento clique aqui para baixá-lo!
+  ${template}
+  Atenciosamente,
+`,
+
+  html: (username: string, folder: string, template = "Olá,") => `
+  <div style="font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <h2 style="color: #2c3e50; text-align: center;">Nov${
+      folder.charAt(folder.length - 1) === "a" ? "a" : "o"
+    } ${folder}</h2>
+    <p style="font-size: 16px; color: #555;">${template}</p>
+    ${
+      template === "Olá,"
+        ? `<p style="font-size: 16px; color: #555;">Você recebeu um novo documento!</p>`
+        : ``
+    }
+    <br/>
+    <p style="font-size: 16px; color: #555;">Você pode baixar tanto aqui quanto na plataforma abaixo:</p>
+    <p style="font-size: 16px; color: #555;">
+      <a href="https://www.seusite.com" style="color: #0000CD; font-weight: bold; text-decoration: underline; text-decoration-color: #ADD8E6;">Gerenciador de Documentos</a>
+    </p>
+
+    <p style="font-size: 16px; color: #555;">
+      Suas credenciais no site, caso for o seu primeiro login, é o seu email e os 8 primeiros digitos do CNPJ (caso o CNPJ nao foi informado no Gestão Click, sera o seu CPF).
+    </p>
+    <p style="font-size: 16px; color: #555;">Atenciosamente,</p>
+    <p style="font-size: 16px; color: #555; font-weight: bold;">${username}</p>
+    <hr style="border: none; height: 1px; background-color: #eee; margin: 20px 0;">
+    <p style="font-size: 12px; color: #999; text-align: center;">© 2024 Document Viewer. Todos os direitos reservados.</p>
+  </div>`,
+  attachments: (filename: string, type: string, pdfContent: any) => [
+    {
+      filename: `${filename}.${type}`,
+      content: pdfContent,
+    },
+  ],
+};
+
 export const resetCodeMailOptions = {
   text: (code: string) => `Olá,
   

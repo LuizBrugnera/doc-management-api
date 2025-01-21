@@ -2,38 +2,37 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { AdminLog } from "./AdminLog";
+import { Os } from "./Os";
 
 @Entity()
-export class Admin {
+export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  name: string;
+  cod: string;
 
   @Column()
-  email: string;
+  name: string;
 
   @Column({
     nullable: true,
   })
-  phone: string;
+  quantity: string;
 
-  @Column("text", {
+  @Column({
     nullable: true,
   })
-  emailTemplate: string;
+  totalValue: string;
 
-  @Column()
-  password: string;
-
-  @OneToMany(() => AdminLog, (adminLog) => adminLog.admin)
-  adminLogs: AdminLog[];
+  @ManyToOne(() => Os, (os) => os.services, {
+    onDelete: "CASCADE",
+  })
+  os: Os;
 
   @CreateDateColumn()
   created_at: Date;

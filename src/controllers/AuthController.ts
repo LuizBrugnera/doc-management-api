@@ -147,8 +147,15 @@ export class AuthController {
 
   registerDepartment = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, email, phone, password, department, foldersAccess } =
-        req.body;
+      const {
+        name,
+        email,
+        phone,
+        password,
+        department,
+        foldersAccess,
+        emailTemplate,
+      } = req.body;
 
       const departmentUserExists =
         await this.departmentService.getDepartmentByEmail(email);
@@ -164,6 +171,7 @@ export class AuthController {
         role: "department",
         phone,
         department,
+        emailTemplate,
       };
       const newDepartment = await this.departmentService.createDepartment(
         departmentUser
