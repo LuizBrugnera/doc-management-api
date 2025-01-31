@@ -82,6 +82,7 @@ class OsUpdater {
       servicos,
       hash,
     } = osData;
+    console.log(nome_cliente);
 
     try {
       const osExists = await this.osService.getOsByKey("cod", codigo);

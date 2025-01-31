@@ -524,7 +524,7 @@ export class DocumentController {
         return;
       }
 
-      await this.documentService.createDocument({
+      const documentCreated = await this.documentService.createDocument({
         name,
         type,
         description,
@@ -551,6 +551,7 @@ export class DocumentController {
 
       res.status(200).json({
         message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
+        documentId: documentCreated.id,
       });
     } catch (error: any) {
       this.handleError(res, error, "Erro ao fazer upload do arquivo");

@@ -15,14 +15,32 @@ export class UserController {
     }
   };
 
+  public getUserByCod = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const cod = parseInt(req.params.cod);
+
+      const user = await this.userService.getUserByKey("cod", String(cod));
+      if (!user) {
+        res.status(404).json({ message: "Usuário não encontrado" });
+        return;
+      }
+      res.json(user);
+      return;
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
       const user = await this.userService.getUserById(id);
       if (!user) {
         res.status(404).json({ message: "Usuário não encontrado" });
+        return;
       }
       res.json(user);
+      return;
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

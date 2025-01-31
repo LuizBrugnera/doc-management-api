@@ -22,6 +22,21 @@ export class Os {
   @Column({
     nullable: true,
   })
+  scheduledDate: Date;
+
+  @Column({
+    nullable: true,
+  })
+  local: string;
+
+  @Column({
+    nullable: true,
+  })
+  documentId: string;
+
+  @Column({
+    nullable: true,
+  })
   hash: string;
 
   @Column({

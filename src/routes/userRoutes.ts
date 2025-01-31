@@ -14,8 +14,9 @@ router.get(
   },
   userController.getAllUsers
 );
-router.get("/:id", userController.getUserById);
-router.post("/", userController.createUser);
+router.get("/id/:id", authMiddleware, userController.getUserById);
+router.get("/cod/:cod", authMiddleware, userController.getUserByCod);
+router.post("/", authMiddleware, userController.createUser);
 router.put("/:id", authMiddleware, userController.updateUser);
 router.delete("/:id", authMiddleware, userController.deleteUser);
 
