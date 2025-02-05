@@ -17,6 +17,9 @@ export class ServiceData {
   @Column()
   name: string;
 
+  @Column({ default: "page" })
+  type: string;
+
   @Column({
     nullable: true,
   })

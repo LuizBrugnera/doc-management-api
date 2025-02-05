@@ -4,6 +4,18 @@ import { OsService } from "../services/OsService";
 export class OsController {
   private osService = new OsService();
 
+  public updateOsWithServices = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      await this.osService.updateOsWithServices();
+      res.json({ message: "Os atualizados com sucesso" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public getAllOss = async (req: Request, res: Response): Promise<void> => {
     try {
       const oss = await this.osService.getAllOss();
