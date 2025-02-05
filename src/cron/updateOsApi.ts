@@ -16,7 +16,8 @@ class OsUpdater {
   private logFile: string;
 
   constructor() {
-    this.API_URL = "https://api.beteltecnologia.com/ordens_servicos/?pagina=";
+    this.API_URL =
+      "https://api.beteltecnologia.com/ordens_servicos/?loja&pagina=";
     this.API_TOKEN = process.env.API_GESTAO_TOKEN || "";
     this.API_SECRET = process.env.API_GESTAO_SECRET || "";
     this.osService = new OsService();
