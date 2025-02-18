@@ -1,3 +1,4 @@
+
 import { Router } from "express";
 import { DepartmentController } from "../controllers/DepartmentController";
 import { authMiddleware } from "../middlewares/authMiddleware";

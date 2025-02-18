@@ -16,6 +16,18 @@ export class OsController {
     }
   };
 
+  public updateOsDbWithGestao = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      await this.osService.updateOsDbWithGestao();
+      res.json({ message: "Os atualizados com sucesso" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public getAllOss = async (req: Request, res: Response): Promise<void> => {
     try {
       const oss = await this.osService.getAllOss();

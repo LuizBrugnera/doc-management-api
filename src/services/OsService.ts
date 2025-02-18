@@ -1,10 +1,117 @@
 import { AppDataSource } from "../data-source";
 import { Os } from "../entities/Os";
 import { ServiceData } from "../entities/ServiceData";
+import axios from "axios";
+import dotenv from "dotenv";
+import fs from "fs";
+dotenv.config();
 
 export class OsService {
   private osRepository = AppDataSource.getRepository(Os);
   private serviceDataRepository = AppDataSource.getRepository(ServiceData);
+  private API_URL =
+    "https://api.beteltecnologia.com/ordens_servicos/?loja&pagina=";
+  private API_TOKEN = process.env.API_GESTAO_TOKEN || "";
+  private API_SECRET = process.env.API_GESTAO_SECRET || "";
+  private logFile = "os_update.log";
+
+  private logErrorToFile(message: string) {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}\n`;
+    fs.appendFile(this.logFile, logMessage, (err) => {
+      if (err) {
+      }
+    });
+  }
+
+  private async fetchTotalPages(): Promise<number> {
+    try {
+      const response = await axios.get(`${this.API_URL}1`, {
+        headers: {
+          "access-token": this.API_TOKEN,
+          "secret-access-token": this.API_SECRET,
+        },
+      });
+      return response.data.meta.total_paginas || 1;
+    } catch (error) {
+      throw new Error(`Failed to fetch total pages: ${error}`);
+    }
+  }
+
+  private async fetchOsByPage(page: number): Promise<any[]> {
+    try {
+      const response = await axios.get(`${this.API_URL}${page}`, {
+        headers: {
+          "access-token": this.API_TOKEN,
+          "secret-access-token": this.API_SECRET,
+        },
+      });
+      return response.data.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private async processOs(osData: any): Promise<void> {
+    const {
+      id,
+      codigo,
+      cliente_id,
+      nome_cliente,
+      vendedor_id,
+      nome_vendedor,
+      tecnico_id,
+      nome_tecnico,
+      data_entrada,
+      data_saida,
+      nome_situacao,
+      valor_total,
+      nome_loja,
+      servicos,
+      hash,
+    } = osData;
+
+    try {
+      const osExists = await this.getOsByKey("cod", codigo);
+
+      if (
+        !osExists &&
+        nome_situacao !== "Em aberto" &&
+        nome_situacao !== "Aguardando pagamento"
+      ) {
+        await this.createOs({
+          cod: codigo,
+          clientId: cliente_id,
+          clientName: nome_cliente,
+          sellerId: vendedor_id,
+          sellerName: nome_vendedor,
+          technicalId: tecnico_id,
+          technicalName: nome_tecnico,
+          entryDate: data_entrada,
+          exitDate: data_saida || null,
+          situationName: nome_situacao,
+          totalValue: valor_total,
+          storeName: nome_loja,
+          hash,
+        });
+      } else {
+      }
+    } catch (error) {
+      this.logErrorToFile(`Error processing OS with code ${codigo}: ${error}`);
+    }
+  }
+
+  public async updateOsDbWithGestao(): Promise<void> {
+    try {
+      const totalPages = await this.fetchTotalPages();
+      for (let page = 1; page <= totalPages; page++) {
+        const osList = await this.fetchOsByPage(page);
+
+        const osPromises = osList.map((os) => this.processOs(os));
+        await Promise.all(osPromises);
+      }
+    } catch (error) {}
+  }
 
   async updateOsWithServices(): Promise<void> {
     const allOs = await this.osRepository.find({ relations: ["services"] });
