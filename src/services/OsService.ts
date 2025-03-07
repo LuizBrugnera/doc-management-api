@@ -94,7 +94,10 @@ export class OsService {
           storeName: nome_loja,
           hash,
         });
-      } else {
+      } else if (osExists) {
+        await this.updateOs(osExists.id, {
+          situationName: nome_situacao,
+        });
       }
     } catch (error) {
       this.logErrorToFile(`Error processing OS with code ${codigo}: ${error}`);
@@ -125,12 +128,62 @@ export class OsService {
     // Filtrar e atualizar apenas as OS que têm correspondência
     const updatedOs = allOs
       .map((os) => {
-        const matchedService = os.services.find((s) => serviceMap.has(s.name));
-        if (matchedService) {
-          os.type = serviceMap.get(matchedService.name) ?? "default_type"; // Garantir que type seja uma string
-          return os;
+        // Obter todos os tipos correspondentes aos services desta OS
+        const matchedTypes = new Set(
+          os.services
+            .map((s) => serviceMap.get(s.name)) // pegar o type pelo nome do service
+            .filter(Boolean) // filtrar undefined
+        );
+
+        // Se não há nenhum tipo correspondido, retornar null (não atualiza)
+        if (matchedTypes.size === 0) {
+          return null;
         }
-        return null; // Retorna null se não houver atualização
+
+        // Se há exatamente 1 tipo
+        if (matchedTypes.size === 1) {
+          const [type] = matchedTypes;
+          if (type === "page") {
+            os.type = "page";
+          } else if (type === "any") {
+            os.type = "any";
+          } else if (type === "training") {
+            os.type = "training";
+          } else {
+            return null; // Se for algo fora do esperado
+          }
+        }
+        // Se há exatamente 2 tipos
+        else if (matchedTypes.size === 2) {
+          if (matchedTypes.has("page") && matchedTypes.has("any")) {
+            os.type = "page-any";
+          } else if (matchedTypes.has("page") && matchedTypes.has("training")) {
+            os.type = "page-training";
+          } else if (matchedTypes.has("any") && matchedTypes.has("training")) {
+            os.type = "any-training";
+          } else {
+            return null;
+          }
+        }
+        // Se há exatamente 3 tipos, verificar se são os três esperados
+        else if (matchedTypes.size === 3) {
+          if (
+            matchedTypes.has("page") &&
+            matchedTypes.has("any") &&
+            matchedTypes.has("training")
+          ) {
+            os.type = "page-any-training";
+          } else {
+            return null; // Se tiver algum outro tipo além desses, não atualiza
+          }
+        }
+        // Caso tenha 4 ou mais tipos, não atualiza (ou ajuste se quiser outro comportamento)
+        else {
+          return null;
+        }
+
+        // Retorna a OS atualizada
+        return os;
       })
       .filter((os): os is Os => os !== null); // Remover valores nulos e garantir tipagem correta
 
