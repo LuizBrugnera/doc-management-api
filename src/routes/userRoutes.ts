@@ -14,6 +14,7 @@ router.get(
   },
   userController.getAllUsers
 );
+router.post("/name", authMiddleware, userController.getUserByNameInString);
 router.get("/id/:id", authMiddleware, userController.getUserById);
 router.get("/cod/:cod", authMiddleware, userController.getUserByCod);
 router.post("/", authMiddleware, userController.createUser);

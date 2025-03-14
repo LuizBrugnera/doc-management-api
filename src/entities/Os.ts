@@ -22,6 +22,16 @@ export class Os {
   @Column({
     nullable: true,
   })
+  description: string;
+
+  @Column({
+    nullable: true,
+  })
+  lastUpdate: string;
+
+  @Column({
+    nullable: true,
+  })
   scheduledDate: Date;
 
   @Column({

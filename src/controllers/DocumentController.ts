@@ -549,9 +549,70 @@ export class DocumentController {
         state: "success",
       });
 
+      const userEmails =
+        await this.emailUserDepartmentService.getAssociationByUserId(user.id);
+
+      const userEmailsText = userEmails.map((email) => email.email).join(", ");
+      try {
+        const type = path.extname(uuid);
+        const filePath = path.join(
+          __dirname,
+          `../../documents/${user.id}/${uuid}`
+        );
+
+        const pdfContent = fs.readFileSync(filePath);
+
+        const depOrAdmin = await this.getDepOrAdminById(
+          user.id,
+          req.user?.role!
+        );
+        const formattedDate = formatDateToDDMMYYYY(formatDateToMySQL(date));
+        const template = depOrAdmin?.emailTemplate || "Olá,";
+        const documentName = `${
+          DocumentController.folderShortNames[folder]
+        } - ${name.split(".")[0]} - ${formattedDate}.${type}`;
+        EmailHelper.sendMail({
+          to: user.mainEmail + "," + userEmailsText,
+          subject: "Documentos para download",
+          text: sendDocumentsMailDinamicTemplateOptions.text(template),
+          html: sendDocumentsMailDinamicTemplateOptions.html(
+            user.name,
+            documentName,
+            template
+          ),
+          attachments: sendDocumentsMailOptions.attachments(
+            folder,
+            type,
+            pdfContent
+          ),
+        }).then((result) => {
+          if (req.user?.id && req.user.role) {
+            if (result) {
+              this.assignLogToUser({
+                userId: req.user.id,
+                action: "Email enviado com Sucesso",
+                date: new Date(),
+                description: `Sucesso ao enviar o email para ${userEmailsText} com o documento ${documentName}`,
+                role: req.user.role,
+                state: "success",
+              });
+            } else {
+              if (req.user?.id && req.user.role) {
+                this.assignLogToUser({
+                  userId: req.user.id,
+                  action: "Falha ao enviar o email",
+                  date: new Date(),
+                  description: `Falha ao enviar o email para o email ${userEmailsText},  usuario - ${user.name}, com o documento - ${documentName}, u ID{${user.id}} c ID {${documentCreated.id}}`,
+                  role: req.user.role,
+                  state: "failure",
+                });
+              }
+            }
+          }
+        });
+      } catch (error) {}
       res.status(200).json({
         message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
-        documentId: documentCreated.id,
       });
     } catch (error: any) {
       this.handleError(res, error, "Erro ao fazer upload do arquivo");
@@ -773,13 +834,14 @@ export class DocumentController {
         await this.emailUserDepartmentService.getAssociationByUserId(user.id);
 
       const userEmailsText = userEmails.map((email) => email.email).join(", ");
+      console.log("Entrando para enviar o Email");
       try {
         const type = path.extname(uuid);
         const filePath = path.join(
           __dirname,
           `../../documents/${user.id}/${uuid}`
         );
-
+        console.log("FilePath", filePath);
         const pdfContent = fs.readFileSync(filePath);
 
         const depOrAdmin = await this.getDepOrAdminById(

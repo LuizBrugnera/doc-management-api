@@ -51,7 +51,7 @@ export const sendDocumentsMailDinamicTemplateOptions = {
     <br/>
     <p style="font-size: 16px; color: #555;">Você pode baixar tanto aqui quanto na plataforma abaixo:</p>
     <p style="font-size: 16px; color: #555;">
-      <a href="https://www.seusite.com" style="color: #0000CD; font-weight: bold; text-decoration: underline; text-decoration-color: #ADD8E6;">Gerenciador de Documentos</a>
+      <a href="https://acessoria-de-seguranca-do-trabalho.com/" style="color: #0000CD; font-weight: bold; text-decoration: underline; text-decoration-color: #ADD8E6;">Gerenciador de Documentos</a>
     </p>
 
     <p style="font-size: 16px; color: #555;">

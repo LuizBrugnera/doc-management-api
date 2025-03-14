@@ -28,9 +28,23 @@ export class OsController {
     }
   };
 
+  public getOsByName = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const name = req.params.name;
+      const os = await this.osService.getAllOssByName(name);
+      if (!os) {
+        res.status(404).json({ message: "Osistrador não encontrado" });
+      }
+      res.json(os);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public getAllOss = async (req: Request, res: Response): Promise<void> => {
     try {
       const oss = await this.osService.getAllOss();
+
       res.json(oss);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -66,7 +80,7 @@ export class OsController {
       const osData = req.body;
       const os = await this.osService.updateOs(id, osData);
       if (!os) {
-        res.status(404).json({ message: "Osistrador não encontrado" });
+        res.status(404).json({ message: "Os não encontrado" });
       }
       res.json(os);
     } catch (error: any) {

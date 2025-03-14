@@ -110,4 +110,17 @@ export class UserController {
       res.status(500).json({ message: error.message });
     }
   };
+
+  public getUserByNameInString = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const name = req.body.name;
+      const user = await this.userService.getUserByNameInString(name);
+      res.status(201).json(user);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
 }

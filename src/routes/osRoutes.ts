@@ -5,8 +5,9 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 const router = Router();
 const osController = new OsController();
 
-router.get("/:id", authMiddleware, osController.getOsById);
-router.get("/", osController.getAllOss);
+router.get("/id/:id", authMiddleware, osController.getOsById);
+router.get("/name/:name", authMiddleware, osController.getOsByName);
+router.get("/", authMiddleware, osController.getAllOss);
 router.put("/:id", osController.updateOs);
 router.delete("/:id", authMiddleware, osController.deleteOs);
 router.patch(

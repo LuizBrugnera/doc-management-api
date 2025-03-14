@@ -4,6 +4,8 @@ import { ServiceData } from "../entities/ServiceData";
 import axios from "axios";
 import dotenv from "dotenv";
 import fs from "fs";
+import { User } from "../entities/User";
+import { Document } from "../entities/Document";
 dotenv.config();
 
 export class OsService {
@@ -193,7 +195,31 @@ export class OsService {
   }
 
   async getAllOss(): Promise<Os[]> {
-    return await this.osRepository.find({ relations: ["services"] });
+    const oss = await this.osRepository
+      .createQueryBuilder("os")
+      .leftJoinAndSelect("os.services", "services")
+      .getMany();
+
+    const documents = await this.osRepository
+      .createQueryBuilder("os")
+      .leftJoin(User, "user", "user.name = os.clientName")
+      .leftJoin(Document, "document", "document.user_id = user.id")
+      .select(["os.id AS os_id", "GROUP_CONCAT(document.id) AS documents"])
+      .groupBy("os.id")
+      .getRawMany();
+
+    const documentMap = new Map<number, number[]>();
+    documents.forEach((doc) => {
+      documentMap.set(
+        doc.os_id,
+        doc.documents ? doc.documents.split(",").map(Number) : []
+      );
+    });
+
+    return oss.map((os) => ({
+      ...os,
+      documents: documentMap.get(os.id) || [],
+    }));
   }
 
   async getOsById(id: number): Promise<Os | null> {
@@ -210,6 +236,13 @@ export class OsService {
   async getOsByKey(key: string, value: string): Promise<Os | null> {
     return await this.osRepository.findOne({
       where: { [key]: value },
+    });
+  }
+
+  async getAllOssByName(name: string): Promise<Os[]> {
+    return await this.osRepository.find({
+      where: { clientName: name },
+      relations: ["services"],
     });
   }
 
