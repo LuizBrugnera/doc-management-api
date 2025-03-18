@@ -18,6 +18,11 @@ export class User {
   @Column()
   name: string;
 
+  @Column({
+    nullable: true,
+  })
+  lastLogin: Date;
+
   @Column()
   mainEmail: string;
 

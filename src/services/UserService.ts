@@ -1,9 +1,17 @@
+import axios from "axios";
 import { usernamesCache } from "../cache/usernamesCache";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
+import { AuthService } from "./AuthService";
+import { EmailUserDepartmentService } from "./EmailUserDepartmentService";
 
 export class UserService {
   private userRepository = AppDataSource.getRepository(User);
+  private authService = new AuthService();
+  private emailUserDepartmentService = new EmailUserDepartmentService();
+  private API_URL = process.env.API_GESTAO_URL || "";
+  private API_TOKEN = process.env.API_GESTAO_TOKEN || "";
+  private API_SECRET = process.env.API_GESTAO_SECRET || "";
 
   async getUserByKey(key: string, value: string): Promise<User | null> {
     return await this.userRepository.findOne({
@@ -29,8 +37,13 @@ export class UserService {
         documents: false,
         password: false,
         notifications: false,
+        lastLogin: true,
       },
     });
+  }
+
+  async updateLastLogin(id: number): Promise<void> {
+    await this.userRepository.update(id, { lastLogin: new Date() });
   }
 
   async getUserByNameInString(fileName: string): Promise<User | null> {
@@ -133,5 +146,130 @@ export class UserService {
   async deleteUser(id: number): Promise<boolean> {
     const result = await this.userRepository.delete(id);
     return result.affected !== 0;
+  }
+
+  private normalizeText(text: string): string {
+    return text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ç/g, "c")
+      .replace(/Ç/g, "C")
+      .replace(/ó/g, "o")
+      .replace(/Ó/g, "O")
+      .toUpperCase();
+  }
+
+  private async fetchTotalPages(): Promise<number> {
+    try {
+      const response = await axios.get(`${this.API_URL}1`, {
+        headers: {
+          "access-token": this.API_TOKEN,
+          "secret-access-token": this.API_SECRET,
+        },
+      });
+      return response.data.meta.total_paginas || 1;
+    } catch (error) {
+      throw new Error(`Failed to fetch total pages: ${error}`);
+    }
+  }
+
+  private async fetchUsersByPage(page: number): Promise<any[]> {
+    try {
+      const response = await axios.get(`${this.API_URL}${page}`, {
+        headers: {
+          "access-token": this.API_TOKEN,
+          "secret-access-token": this.API_SECRET,
+        },
+      });
+      return response.data.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private generatePassword(cpf?: string, cnpj?: string): string | null {
+    if (cnpj) {
+      return cnpj.replace(/\D/g, "").slice(0, 8);
+    }
+    if (cpf) {
+      return cpf.replace(/\D/g, "").slice(0, 8);
+    }
+    return null;
+  }
+
+  private async processUser(userData: any): Promise<void> {
+    const { id, razao_social, email, cpf, rg, cnpj, celular, contatos } =
+      userData;
+
+    if (!razao_social) {
+      return;
+    }
+
+    const password = this.generatePassword(cpf, cnpj);
+    if (!password) {
+      return;
+    }
+
+    const userEmail = email || `${password}@example.com`;
+
+    try {
+      const userExists = await this.getUserByKey("cod", id);
+
+      if (!userExists) {
+        const hashedPassword = await this.authService.hashPassword(password);
+        const createdUser = await this.createUser({
+          name: this.normalizeText(razao_social),
+          cod: id,
+          mainEmail: userEmail,
+          cpf,
+          rg,
+          cnpj,
+          password: hashedPassword,
+          phone: celular,
+        });
+
+        if (contatos && contatos.length > 0) {
+          contatos.forEach(async (contact: { contato: any }) => {
+            await this.emailUserDepartmentService.createAssociation({
+              user: createdUser,
+              email: contact.contato.contato,
+              department: contact.contato.nome_tipo,
+            });
+          });
+        }
+      } else {
+        if (contatos && contatos.length > 0) {
+          const contactsExists =
+            await this.emailUserDepartmentService.getAssociationByUserId(
+              userExists.id
+            );
+
+          contatos.forEach(async (contact: { contato: any }) => {
+            const contactExists = contactsExists.find(
+              (contactExists) => contactExists.email === contact.contato.contato
+            );
+            if (!contactExists) {
+              await this.emailUserDepartmentService.createAssociation({
+                user: userExists,
+                email: contact.contato.contato,
+                department: contact.contato.nome_tipo,
+              });
+            }
+          });
+        }
+      }
+    } catch (error) {}
+  }
+
+  public async updateUsersDbWithGestao(): Promise<void> {
+    try {
+      const totalPages = await this.fetchTotalPages();
+      for (let page = 1; page <= totalPages; page++) {
+        const users = await this.fetchUsersByPage(page);
+
+        const userPromises = users.map((user) => this.processUser(user));
+        await Promise.all(userPromises);
+      }
+    } catch (error) {}
   }
 }

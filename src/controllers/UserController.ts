@@ -123,4 +123,16 @@ export class UserController {
       res.status(500).json({ message: error.message });
     }
   };
+
+  public updateByGestao = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      await this.userService.updateUsersDbWithGestao();
+      res.json({ message: "Usuário atualizado com sucesso" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
 }

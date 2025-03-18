@@ -222,6 +222,8 @@ export class AuthController {
         return;
       }
 
+      this.userService.updateLastLogin(userExists.id);
+
       const token = await this.authService.generateToken({
         id: userExists.id,
         email: userExists.mainEmail,

@@ -20,5 +20,6 @@ router.get("/cod/:cod", authMiddleware, userController.getUserByCod);
 router.post("/", authMiddleware, userController.createUser);
 router.put("/:id", authMiddleware, userController.updateUser);
 router.delete("/:id", authMiddleware, userController.deleteUser);
+router.post("/update-gestao", authMiddleware, userController.updateByGestao);
 
 export default router;
