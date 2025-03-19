@@ -257,6 +257,13 @@ export class UserService {
             }
           });
         }
+
+        await this.updateUser(userExists.id, {
+          phone: celular,
+          rg: rg,
+          cpf: cpf,
+          cnpj: cnpj,
+        });
       }
     } catch (error) {}
   }

@@ -127,6 +127,25 @@ class OsUpdater {
         }
       } else {
         console.log(`OS with code ${codigo} already exists. Skipping.`);
+        if (osExists) {
+          if (
+            (osExists.situationName === "cliente protestado" ||
+              osExists.situationName === "Faturado renovado" ||
+              osExists.situationName === "Contrato renovado" ||
+              osExists.situationName === "Contrato não renovado" ||
+              osExists.situationName === "Contrato vencido" ||
+              osExists.situationName === "Contrato cancelado" ||
+              osExists.situationName === "Cancelado" ||
+              osExists.situationName === "Em processo de Renovação" ||
+              osExists.situationName === "Faturamento" ||
+              osExists.situationName === "Enviando laudos p/ cliente") &&
+            osExists.status === "pending"
+          ) {
+            await this.osService.updateOs(osExists.id, {
+              status: "free-from-gestao",
+            });
+          }
+        }
       }
     } catch (error) {
       console.error(`Error processing OS with code ${codigo}:`, error);

@@ -97,9 +97,28 @@ export class OsService {
           hash,
         });
       } else if (osExists) {
-        await this.updateOs(osExists.id, {
-          situationName: nome_situacao,
-        });
+        if (
+          (nome_situacao === "cliente protestado" ||
+            nome_situacao === "Faturado renovado" ||
+            nome_situacao === "Contrato renovado" ||
+            nome_situacao === "Contrato não renovado" ||
+            nome_situacao === "Contrato vencido" ||
+            nome_situacao === "Contrato cancelado" ||
+            nome_situacao === "Cancelado" ||
+            nome_situacao === "Em processo de Renovação" ||
+            nome_situacao === "Faturamento" ||
+            nome_situacao === "Enviando laudos p/ cliente") &&
+          osExists.status === "pending"
+        ) {
+          await this.updateOs(osExists.id, {
+            status: "free-from-gestao",
+            situationName: nome_situacao,
+          });
+        } else {
+          await this.updateOs(osExists.id, {
+            situationName: nome_situacao,
+          });
+        }
       }
     } catch (error) {
       this.logErrorToFile(`Error processing OS with code ${codigo}: ${error}`);
