@@ -84,4 +84,8 @@ const fileFilter = (
   }
 };
 
-export const autoAssignUpload = multer({ storage, fileFilter });
+export const autoAssignUpload = multer({
+  limits: { fileSize: 100 * 1024 * 1024 },
+  storage,
+  fileFilter,
+});
