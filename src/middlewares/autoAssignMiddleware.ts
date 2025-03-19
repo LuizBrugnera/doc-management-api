@@ -26,17 +26,17 @@ const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       const userService = new UserService();
-      console.log(file.originalname);
+
       const filenameWithoutExtension = normalizeText(
         getFileNameWithoutExtension(
           Buffer.from(file.originalname, "latin1").toString("utf8")
         )
       );
-      console.log(filenameWithoutExtension);
+
       const user = await userService.getUserByNameInString(
         filenameWithoutExtension.trim()
       );
-      console.log(user);
+
       if (!user) {
         return cb(new Error("Usuário não encontrado, upload descartado"), "");
       }
