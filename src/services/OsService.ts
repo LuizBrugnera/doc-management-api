@@ -16,6 +16,13 @@ export class OsService {
   private API_TOKEN = process.env.API_GESTAO_TOKEN || "";
   private API_SECRET = process.env.API_GESTAO_SECRET || "";
   private logFile = "os_update.log";
+  private storeToNumber: Record<string, string> = {
+    "GODOY ASSESSORIA": "GA-",
+    "BETEL TREIN": "BT-",
+    LAPAMEDSEG: "LM-",
+    SOUZASEG: "SZ-",
+    "BETEL ASSES": "BA-",
+  };
 
   private logErrorToFile(message: string) {
     const timestamp = new Date().toISOString();
@@ -74,22 +81,18 @@ export class OsService {
     } = osData;
 
     try {
-      const osExists = await this.getOsByKey("cod", codigo);
-      if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
-        console.log("-------");
-        console.log("em cima");
-        console.log(nome_cliente);
-        console.log(nome_situacao);
-        console.log("codigo" + codigo);
-        console.log("-------");
-      }
+      const osExists = await this.getOsByKey(
+        "cod",
+        this.storeToNumber[nome_loja] + codigo
+      );
+
       if (
         !osExists &&
         nome_situacao !== "Em aberto" &&
         nome_situacao !== "Aguardando pagamento"
       ) {
         await this.createOs({
-          cod: codigo,
+          cod: this.storeToNumber[nome_loja] + codigo,
           clientId: cliente_id,
           clientName: nome_cliente,
           sellerId: vendedor_id,
@@ -118,40 +121,22 @@ export class OsService {
             nome_situacao === "Enviando laudos p/ cliente") &&
           osExists.status === "pending"
         ) {
-          if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
-            console.log("-------");
-            console.log("em baixo");
-            console.log("id" + osExists.id);
-            console.log(osExists.status);
-            console.log(nome_cliente);
-            console.log(nome_situacao);
-            console.log("codigo" + codigo);
-            console.log("-------");
-          }
-
           await this.updateOs(osExists.id, {
             status: "free-from-gestao",
             situationName: nome_situacao,
           });
         } else {
-          if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
-            console.log("-------");
-            console.log("no else");
-            console.log("id" + osExists.id);
-            console.log(osExists.status);
-            console.log(nome_cliente);
-            console.log(nome_situacao);
-            console.log("codigo" + codigo);
-            console.log("-------");
-            console.log(osExists);
-          }
           await this.updateOs(osExists.id, {
             situationName: nome_situacao,
           });
         }
       }
     } catch (error) {
-      this.logErrorToFile(`Error processing OS with code ${codigo}: ${error}`);
+      this.logErrorToFile(
+        `Error processing OS with code ${
+          this.storeToNumber[nome_loja] + codigo
+        }: ${error}`
+      );
     }
   }
 

@@ -83,10 +83,20 @@ class OsUpdater {
       servicos,
       hash,
     } = osData;
-    console.log(nome_cliente);
+
+    const storeToNumber: Record<string, string> = {
+      "GODOY ASSESSORIA": "GA-",
+      "BETEL TREIN": "BT-",
+      LAPAMEDSEG: "LM-",
+      SOUZASEG: "SZ-",
+      "BETEL ASSES": "BA-",
+    };
 
     try {
-      const osExists = await this.osService.getOsByKey("cod", codigo);
+      const osExists = await this.osService.getOsByKey(
+        "cod",
+        storeToNumber[nome_loja] + storeToNumber[nome_loja] + codigo
+      );
 
       if (
         !osExists &&
@@ -94,7 +104,7 @@ class OsUpdater {
         nome_situacao !== "Aguardando pagamento"
       ) {
         const createdOs = await this.osService.createOs({
-          cod: codigo,
+          cod: storeToNumber[nome_loja] + codigo,
           clientId: cliente_id,
           clientName: nome_cliente,
           sellerId: vendedor_id,
@@ -109,9 +119,13 @@ class OsUpdater {
           hash,
         });
 
-        console.log(`OS with code ${codigo} created successfully.`);
+        console.log(
+          `OS with code ${
+            storeToNumber[nome_loja] + codigo
+          } created successfully.`
+        );
 
-        if (servicos && servicos.length > 0) {
+        if (servicos && servicos.length > 0 && false) {
           for (const service of servicos) {
             const { id, nome_servico, quantidade, valor_total } =
               service.servico;
@@ -123,10 +137,18 @@ class OsUpdater {
               totalValue: valor_total,
             });
           }
-          console.log(`Services for OS code ${codigo} processed successfully.`);
+          console.log(
+            `Services for OS code ${
+              storeToNumber[nome_loja] + codigo
+            } processed successfully.`
+          );
         }
       } else {
-        console.log(`OS with code ${codigo} already exists. Skipping.`);
+        console.log(
+          `OS with code ${
+            storeToNumber[nome_loja] + codigo
+          } already exists. Skipping.`
+        );
         if (osExists) {
           if (
             (osExists.situationName === "cliente protestado" ||
@@ -149,8 +171,15 @@ class OsUpdater {
         }
       }
     } catch (error) {
-      console.error(`Error processing OS with code ${codigo}:`, error);
-      this.logErrorToFile(`Error processing OS with code ${codigo}: ${error}`);
+      console.error(
+        `Error processing OS with code ${storeToNumber[nome_loja] + codigo}:`,
+        error
+      );
+      this.logErrorToFile(
+        `Error processing OS with code ${
+          storeToNumber[nome_loja] + codigo
+        }: ${error}`
+      );
     }
   }
 
