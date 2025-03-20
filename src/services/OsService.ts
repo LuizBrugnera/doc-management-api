@@ -80,6 +80,7 @@ export class OsService {
         console.log("em cima");
         console.log(nome_cliente);
         console.log(nome_situacao);
+        console.log(codigo);
         console.log("-------");
       }
       if (
@@ -124,6 +125,7 @@ export class OsService {
             console.log(osExists.status);
             console.log(nome_cliente);
             console.log(nome_situacao);
+            console.log(codigo);
             console.log("-------");
           }
 
@@ -139,6 +141,7 @@ export class OsService {
             console.log(osExists.status);
             console.log(nome_cliente);
             console.log(nome_situacao);
+            console.log(codigo);
             console.log("-------");
             console.log(osExists);
           }
