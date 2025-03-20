@@ -140,6 +140,7 @@ export class OsService {
             console.log(nome_cliente);
             console.log(nome_situacao);
             console.log("-------");
+            console.log(osExists);
           }
           await this.updateOs(osExists.id, {
             situationName: nome_situacao,
