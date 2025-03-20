@@ -75,7 +75,11 @@ export class OsService {
 
     try {
       const osExists = await this.getOsByKey("cod", codigo);
-
+      if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
+        console.log(nome_cliente);
+        console.log(nome_situacao);
+        console.log("-------");
+      }
       if (
         !osExists &&
         nome_situacao !== "Em aberto" &&
@@ -97,6 +101,11 @@ export class OsService {
           hash,
         });
       } else if (osExists) {
+        if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
+          console.log(osExists.status);
+          console.log(nome_cliente);
+          console.log(nome_situacao);
+        }
         if (
           (nome_situacao === "cliente protestado" ||
             nome_situacao === "Faturado renovado" ||
