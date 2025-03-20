@@ -107,6 +107,7 @@ export class OsService {
             nome_situacao === "Cancelado" ||
             nome_situacao === "Em processo de Renovação" ||
             nome_situacao === "Faturamento" ||
+            nome_situacao === "Concluído" ||
             nome_situacao === "Enviando laudos p/ cliente") &&
           osExists.status === "pending"
         ) {

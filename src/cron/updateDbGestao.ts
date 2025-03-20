@@ -130,7 +130,7 @@ class UserUpdater {
 
         console.log(`User with ID ${id} created successfully.`);
 
-        if (contatos && contatos.length > 0 && false) {
+        if (contatos && contatos.length > 0) {
           console.log(contatos);
           contatos.forEach((contact: { contato: any }) => {
             this.emailUserDepartmentService.createAssociation({
