@@ -76,6 +76,8 @@ export class OsService {
     try {
       const osExists = await this.getOsByKey("cod", codigo);
       if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
+        console.log("-------");
+        console.log("em cima");
         console.log(nome_cliente);
         console.log(nome_situacao);
         console.log("-------");
@@ -101,11 +103,6 @@ export class OsService {
           hash,
         });
       } else if (osExists) {
-        if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
-          console.log(osExists.status);
-          console.log(nome_cliente);
-          console.log(nome_situacao);
-        }
         if (
           (nome_situacao === "cliente protestado" ||
             nome_situacao === "Faturado renovado" ||
@@ -120,11 +117,30 @@ export class OsService {
             nome_situacao === "Enviando laudos p/ cliente") &&
           osExists.status === "pending"
         ) {
+          if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
+            console.log("-------");
+            console.log("em baixo");
+            console.log(osExists.id);
+            console.log(osExists.status);
+            console.log(nome_cliente);
+            console.log(nome_situacao);
+            console.log("-------");
+          }
+
           await this.updateOs(osExists.id, {
             status: "free-from-gestao",
             situationName: nome_situacao,
           });
         } else {
+          if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
+            console.log("-------");
+            console.log("no else");
+            console.log(osExists.id);
+            console.log(osExists.status);
+            console.log(nome_cliente);
+            console.log(nome_situacao);
+            console.log("-------");
+          }
           await this.updateOs(osExists.id, {
             situationName: nome_situacao,
           });
