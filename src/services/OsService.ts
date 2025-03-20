@@ -80,7 +80,7 @@ export class OsService {
         console.log("em cima");
         console.log(nome_cliente);
         console.log(nome_situacao);
-        console.log(codigo);
+        console.log("codigo" + codigo);
         console.log("-------");
       }
       if (
@@ -121,11 +121,11 @@ export class OsService {
           if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
             console.log("-------");
             console.log("em baixo");
-            console.log(osExists.id);
+            console.log("id" + osExists.id);
             console.log(osExists.status);
             console.log(nome_cliente);
             console.log(nome_situacao);
-            console.log(codigo);
+            console.log("codigo" + codigo);
             console.log("-------");
           }
 
@@ -137,11 +137,11 @@ export class OsService {
           if (nome_cliente === "ESFERA SERVICOS ADMINISTRATIVOS EIRELI") {
             console.log("-------");
             console.log("no else");
-            console.log(osExists.id);
+            console.log("id" + osExists.id);
             console.log(osExists.status);
             console.log(nome_cliente);
             console.log(nome_situacao);
-            console.log(codigo);
+            console.log("codigo" + codigo);
             console.log("-------");
             console.log(osExists);
           }
