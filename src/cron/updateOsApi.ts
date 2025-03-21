@@ -125,7 +125,7 @@ class OsUpdater {
           } created successfully.`
         );
 
-        if (servicos && servicos.length > 0 && false) {
+        if (servicos && servicos.length > 0) {
           for (const service of servicos) {
             const { id, nome_servico, quantidade, valor_total } =
               service.servico;

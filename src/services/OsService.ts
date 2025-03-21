@@ -6,10 +6,13 @@ import dotenv from "dotenv";
 import fs from "fs";
 import { User } from "../entities/User";
 import { Document } from "../entities/Document";
+import { Service } from "../entities/Service";
+import { ServiceService } from "./ServiceService";
 dotenv.config();
 
 export class OsService {
   private osRepository = AppDataSource.getRepository(Os);
+  private serviceService = new ServiceService();
   private serviceDataRepository = AppDataSource.getRepository(ServiceData);
   private API_URL =
     "https://api.beteltecnologia.com/ordens_servicos/?loja&pagina=";
@@ -91,7 +94,7 @@ export class OsService {
         nome_situacao !== "Em aberto" &&
         nome_situacao !== "Aguardando pagamento"
       ) {
-        await this.createOs({
+        const createdOs = await this.createOs({
           cod: this.storeToNumber[nome_loja] + codigo,
           clientId: cliente_id,
           clientName: nome_cliente,
@@ -106,6 +109,25 @@ export class OsService {
           storeName: nome_loja,
           hash,
         });
+
+        if (servicos && servicos.length > 0) {
+          for (const service of servicos) {
+            const { id, nome_servico, quantidade, valor_total } =
+              service.servico;
+            await this.serviceService.createService({
+              cod: id,
+              os: createdOs,
+              name: nome_servico,
+              quantity: quantidade,
+              totalValue: valor_total,
+            });
+          }
+          console.log(
+            `Services for OS code ${
+              this.storeToNumber[nome_loja] + codigo
+            } processed successfully.`
+          );
+        }
       } else if (osExists) {
         if (
           (nome_situacao === "cliente protestado" ||
