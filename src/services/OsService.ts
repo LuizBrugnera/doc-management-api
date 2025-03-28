@@ -6,14 +6,16 @@ import dotenv from "dotenv";
 import fs from "fs";
 import { User } from "../entities/User";
 import { Document } from "../entities/Document";
-import { Service } from "../entities/Service";
 import { ServiceService } from "./ServiceService";
+
+import { OsHistoricService } from "./OsHistoricService";
 dotenv.config();
 
 export class OsService {
   private osRepository = AppDataSource.getRepository(Os);
   private serviceService = new ServiceService();
   private serviceDataRepository = AppDataSource.getRepository(ServiceData);
+  private osHistoricService = new OsHistoricService();
   private API_URL =
     "https://api.beteltecnologia.com/ordens_servicos/?loja&pagina=";
   private API_TOKEN = process.env.API_GESTAO_TOKEN || "";
@@ -64,6 +66,10 @@ export class OsService {
     }
   }
 
+  private addOneDay(date: Date): Date {
+    return new Date(date.getTime() + 24 * 60 * 60 * 1000);
+  }
+
   private async processOs(osData: any): Promise<void> {
     const {
       id,
@@ -102,8 +108,12 @@ export class OsService {
           sellerName: nome_vendedor,
           technicalId: tecnico_id,
           technicalName: nome_tecnico,
-          entryDate: data_entrada,
-          exitDate: data_saida || null,
+          exitDate: data_saida
+            ? this.addOneDay(new Date(data_saida))
+            : undefined,
+          entryDate: new Date(
+            data_entrada ? this.addOneDay(new Date(data_entrada)) : data_entrada
+          ),
           situationName: nome_situacao,
           totalValue: valor_total,
           storeName: nome_loja,
@@ -140,12 +150,20 @@ export class OsService {
             nome_situacao === "Em processo de Renovação" ||
             nome_situacao === "Faturamento" ||
             nome_situacao === "Concluído" ||
+            nome_situacao === "Alterar dados" ||
+            nome_situacao === "Laudos assinados" ||
             nome_situacao === "Enviando laudos p/ cliente") &&
           osExists.status === "pending"
         ) {
           await this.updateOs(osExists.id, {
             status: "free-from-gestao",
             situationName: nome_situacao,
+            exitDate: data_saida
+              ? this.addOneDay(new Date(data_saida))
+              : undefined,
+            entryDate: data_entrada
+              ? this.addOneDay(new Date(data_entrada))
+              : data_entrada,
           });
         } else {
           await this.updateOs(osExists.id, {
@@ -254,6 +272,10 @@ export class OsService {
     const oss = await this.osRepository
       .createQueryBuilder("os")
       .leftJoinAndSelect("os.services", "services")
+      .leftJoinAndSelect("os.osHistoric", "osHistoric") // ← adiciona a relação com OsHistoric
+      .where("os.situationName NOT IN (:...excludedSituations)", {
+        excludedSituations: ["Em aberto", "Aguardando pagamento"],
+      })
       .getMany();
 
     const documents = await this.osRepository

@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Service } from "./Service";
+import { OsHistoric } from "./OsHistoric";
 
 @Entity()
 export class Os {
@@ -109,6 +110,9 @@ export class Os {
 
   @OneToMany(() => Service, (service) => service.os)
   services: Service[];
+
+  @OneToMany(() => OsHistoric, (osHistoric) => osHistoric.os)
+  osHistoric: OsHistoric[];
 
   @CreateDateColumn()
   created_at: Date;

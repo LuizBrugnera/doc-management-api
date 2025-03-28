@@ -161,6 +161,8 @@ class OsUpdater {
               osExists.situationName === "Em processo de Renovação" ||
               osExists.situationName === "Faturamento" ||
               osExists.situationName === "Concluído" ||
+              osExists.situationName === "Alterar dados" ||
+              osExists.situationName === "Laudos assinados" ||
               osExists.situationName === "Enviando laudos p/ cliente") &&
             osExists.status === "pending"
           ) {
