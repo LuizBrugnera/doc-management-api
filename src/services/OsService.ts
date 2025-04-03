@@ -89,17 +89,85 @@ export class OsService {
       hash,
     } = osData;
 
+    if (nome_cliente === "PETRIM ODONTOLOGIA LTDA") {
+      console.log("++---------------------------++");
+      console.log(osData);
+    }
+    if (nome_cliente === "TRIANGULO MOBILIARIO LTDA") {
+      console.log("++---------------------------++");
+      console.log(osData);
+    }
+    if (
+      nome_cliente ===
+      "IMPACTTY TRATAMENTO DE CONCRETO E PINTURAS EM GERAL LTDA"
+    ) {
+      console.log("++---------------------------++");
+      console.log(osData);
+    }
+    if (nome_cliente === "GASTRONOMIA DOIS IRMAOS LTDA") {
+      console.log("++---------------------------++");
+      console.log(osData);
+    }
+    if (nome_cliente === "RODRIGO BEZERRA DO NASCIMENTO 31299171877") {
+      console.log("++---------------------------++");
+      console.log(osData);
+    }
     try {
       const osExists = await this.getOsByKey(
         "cod",
         this.storeToNumber[nome_loja] + codigo
       );
-
+      if (nome_cliente === "PETRIM ODONTOLOGIA LTDA") {
+        console.log("--------------------");
+        console.log(osExists);
+      }
+      if (nome_cliente === "TRIANGULO MOBILIARIO LTDA") {
+        console.log("--------------------");
+        console.log(osExists);
+      }
+      if (
+        nome_cliente ===
+        "IMPACTTY TRATAMENTO DE CONCRETO E PINTURAS EM GERAL LTDA"
+      ) {
+        console.log("--------------------");
+        console.log(osExists);
+      }
+      if (nome_cliente === "GASTRONOMIA DOIS IRMAOS LTDA") {
+        console.log("--------------------");
+        console.log(osExists);
+      }
+      if (nome_cliente === "RODRIGO BEZERRA DO NASCIMENTO 31299171877") {
+        console.log("--------------------");
+        console.log(osExists);
+      }
       if (
         !osExists &&
         nome_situacao !== "Em aberto" &&
         nome_situacao !== "Aguardando pagamento"
       ) {
+        if (nome_cliente === "PETRIM ODONTOLOGIA LTDA") {
+          console.log("Criando");
+          console.log("++---------------------------++");
+        }
+        if (nome_cliente === "TRIANGULO MOBILIARIO LTDA") {
+          console.log("Criando");
+          console.log("++---------------------------++");
+        }
+        if (
+          nome_cliente ===
+          "IMPACTTY TRATAMENTO DE CONCRETO E PINTURAS EM GERAL LTDA"
+        ) {
+          console.log("Criando");
+          console.log("++---------------------------++");
+        }
+        if (nome_cliente === "GASTRONOMIA DOIS IRMAOS LTDA") {
+          console.log("Criando");
+          console.log("++---------------------------++");
+        }
+        if (nome_cliente === "RODRIGO BEZERRA DO NASCIMENTO 31299171877") {
+          console.log("Criando");
+          console.log("++---------------------------++");
+        }
         const createdOs = await this.createOs({
           cod: this.storeToNumber[nome_loja] + codigo,
           clientId: cliente_id,
@@ -132,11 +200,6 @@ export class OsService {
               totalValue: valor_total,
             });
           }
-          console.log(
-            `Services for OS code ${
-              this.storeToNumber[nome_loja] + codigo
-            } processed successfully.`
-          );
         }
       } else if (osExists) {
         if (
@@ -155,6 +218,29 @@ export class OsService {
             nome_situacao === "Enviando laudos p/ cliente") &&
           osExists.status === "pending"
         ) {
+          if (nome_cliente === "PETRIM ODONTOLOGIA LTDA") {
+            console.log("Entrou na primeira atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "TRIANGULO MOBILIARIO LTDA") {
+            console.log("Entrou na primeira atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (
+            nome_cliente ===
+            "IMPACTTY TRATAMENTO DE CONCRETO E PINTURAS EM GERAL LTDA"
+          ) {
+            console.log("Entrou na primeira atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "GASTRONOMIA DOIS IRMAOS LTDA") {
+            console.log("Entrou na primeira atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "RODRIGO BEZERRA DO NASCIMENTO 31299171877") {
+            console.log("Entrou na primeira atualizacao");
+            console.log("++---------------------------++");
+          }
           await this.updateOs(osExists.id, {
             status: "free-from-gestao",
             situationName: nome_situacao,
@@ -166,8 +252,37 @@ export class OsService {
               : data_entrada,
           });
         } else {
+          if (nome_cliente === "PETRIM ODONTOLOGIA LTDA") {
+            console.log("Entrou na segunda atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "TRIANGULO MOBILIARIO LTDA") {
+            console.log("Entrou na segunda atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (
+            nome_cliente ===
+            "IMPACTTY TRATAMENTO DE CONCRETO E PINTURAS EM GERAL LTDA"
+          ) {
+            console.log("Entrou na segunda atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "GASTRONOMIA DOIS IRMAOS LTDA") {
+            console.log("Entrou na segunda atualizacao");
+            console.log("++---------------------------++");
+          }
+          if (nome_cliente === "RODRIGO BEZERRA DO NASCIMENTO 31299171877") {
+            console.log("Entrou na segunda atualizacao");
+            console.log("++---------------------------++");
+          }
           await this.updateOs(osExists.id, {
             situationName: nome_situacao,
+            exitDate: data_saida
+              ? this.addOneDay(new Date(data_saida))
+              : undefined,
+            entryDate: data_entrada
+              ? this.addOneDay(new Date(data_entrada))
+              : data_entrada,
           });
         }
       }

@@ -259,6 +259,7 @@ export class UserService {
         }
 
         await this.updateUser(userExists.id, {
+          mainEmail: userEmail,
           phone: celular,
           rg: rg,
           cpf: cpf,
