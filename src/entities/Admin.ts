@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { AdminLog } from "./AdminLog";
+import { EmailTemplate } from "./EmailTemplate";
 
 @Entity()
 export class Admin {
@@ -24,16 +25,15 @@ export class Admin {
   })
   phone: string;
 
-  @Column("text", {
-    nullable: true,
-  })
-  emailTemplate: string;
 
   @Column()
   password: string;
 
   @OneToMany(() => AdminLog, (adminLog) => adminLog.admin)
   adminLogs: AdminLog[];
+
+  @OneToMany(() => EmailTemplate, (template) => template.admin)
+  emailTemplates: EmailTemplate[];
 
   @CreateDateColumn()
   created_at: Date;

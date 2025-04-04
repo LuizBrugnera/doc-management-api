@@ -18,6 +18,7 @@ import {
 } from "../helper/EmailData";
 import { Log } from "../entities/Log";
 import { EmailUserDepartmentService } from "../services/EmailUserDepartmentService";
+import { EmailTemplateService } from "../services/EmailTemplateService";
 
 export class DocumentController {
   private userService = new UserService();
@@ -29,6 +30,7 @@ export class DocumentController {
   private adminLogService = new AdminLogService();
   private folderAccessService = new FolderAccessService();
   private emailUserDepartmentService = new EmailUserDepartmentService();
+  private emailTemplateService = new EmailTemplateService();
 
   private static readonly folderNames = [
     "boletos",
@@ -499,7 +501,8 @@ export class DocumentController {
   ): Promise<void> => {
     try {
       const userId = parseInt(req.params.userId);
-      const { name, type, description, folder } = req.body;
+
+      const { name, type, description, folder, templateId } = req.body;
       const file = req.file;
       const uuid = req.uuidFile;
 
@@ -567,13 +570,17 @@ export class DocumentController {
           req.user?.role!
         );
         const formattedDate = formatDateToDDMMYYYY(formatDateToMySQL(date));
-        const template = depOrAdmin?.emailTemplate || "Olá,";
+        const templateExists =
+          await this.emailTemplateService.getEmailTemplateById(templateId);
+
+        const template = templateExists?.content || "Olá,";
+
         const documentName = `${
           DocumentController.folderShortNames[folder]
         } - ${name.split(".")[0]} - ${formattedDate}.${type}`;
         EmailHelper.sendMail({
           to: user.mainEmail + "," + userEmailsText,
-          subject: "Documentos para download",
+          subject: templateExists?.subject || "Documentos para download",
           text: sendDocumentsMailDinamicTemplateOptions.text(template),
           html: sendDocumentsMailDinamicTemplateOptions.html(
             user.name,
@@ -736,7 +743,7 @@ export class DocumentController {
     res: Response
   ): Promise<void> => {
     try {
-      const { name, type, description, folder } = req.body;
+      const { name, type, description, folder, templateId } = req.body;
       const file = req.file;
       const uuid = req.uuidFile;
       const userId = req.documentUserId;
@@ -849,11 +856,14 @@ export class DocumentController {
           req.user?.role!
         );
 
-        const template = depOrAdmin?.emailTemplate || "Olá,";
+        const templateExists =
+          await this.emailTemplateService.getEmailTemplateById(templateId);
+
+        const template = templateExists?.content || "Olá,";
 
         EmailHelper.sendMail({
           to: user.mainEmail + "," + userEmailsText,
-          subject: "Documentos para download",
+          subject: templateExists?.subject || "Documentos para download",
           text: sendDocumentsMailDinamicTemplateOptions.text(template),
           html: sendDocumentsMailDinamicTemplateOptions.html(
             user.name,

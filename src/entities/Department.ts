@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { FolderAccess } from "./FolderAccess";
 import { Log } from "./Log";
+import { EmailTemplate } from "./EmailTemplate";
 
 @Entity()
 export class Department {
@@ -31,16 +32,14 @@ export class Department {
   @Column()
   department: string;
 
-  @Column("text", {
-    nullable: true,
-  })
-  emailTemplate: string;
-
   @OneToMany(() => FolderAccess, (folderAccess) => folderAccess.department)
   foldersAccess: FolderAccess[];
 
   @OneToMany(() => Log, (log) => log.department)
   logs: Log[];
+
+  @OneToMany(() => EmailTemplate, (template) => template.department)
+  emailTemplates: EmailTemplate[];
 
   @CreateDateColumn()
   created_at: Date;
