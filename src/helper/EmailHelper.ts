@@ -21,7 +21,6 @@ export const EmailHelper = {
           pass: process.env.EMAIL_PASS,
         },
       });
-
       const mailOptions = {
         from: `"Document Viewer" <${process.env.EMAIL_USER}>`,
         to: options.to,

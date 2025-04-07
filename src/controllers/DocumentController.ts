@@ -495,6 +495,13 @@ export class DocumentController {
     }
   };
 
+  private replacePlaceholders(
+    template: string,
+    values: Record<string, string>
+  ): string {
+    return template.replace(/\[(\w+)\]/g, (_, key) => values[key] || "");
+  }
+
   public uploadDocument = async (
     req: Request,
     res: Response
@@ -573,19 +580,30 @@ export class DocumentController {
         const templateExists =
           await this.emailTemplateService.getEmailTemplateById(templateId);
 
+        const values = {
+          nome: user.name,
+          email: user.mainEmail,
+          cpf: user.cpf || "Não Informado",
+          cnpj: user.cnpj || "Não Informado",
+        };
+
         const template = templateExists?.content || "Olá,";
+
+        const formattedTemplate = this.replacePlaceholders(template, values);
 
         const documentName = `${
           DocumentController.folderShortNames[folder]
         } - ${name.split(".")[0]} - ${formattedDate}.${type}`;
         EmailHelper.sendMail({
-          to: user.mainEmail + "," + userEmailsText,
+          to: userEmailsText
+            ? user.mainEmail + "," + userEmailsText
+            : user.mainEmail,
           subject: templateExists?.subject || "Documentos para download",
-          text: sendDocumentsMailDinamicTemplateOptions.text(template),
+          text: sendDocumentsMailDinamicTemplateOptions.text(formattedTemplate),
           html: sendDocumentsMailDinamicTemplateOptions.html(
             user.name,
             documentName,
-            template
+            formattedTemplate.replace(/\n/g, "<br/>")
           ),
           attachments: sendDocumentsMailOptions.attachments(
             folder,
@@ -859,16 +877,25 @@ export class DocumentController {
         const templateExists =
           await this.emailTemplateService.getEmailTemplateById(templateId);
 
+        const values = {
+          nome: user.name,
+          email: user.mainEmail,
+          cpf: user.cpf || "Não Informado",
+          cnpj: user.cnpj || "Não Informado",
+        };
+
         const template = templateExists?.content || "Olá,";
+
+        const formattedTemplate = this.replacePlaceholders(template, values);
 
         EmailHelper.sendMail({
           to: user.mainEmail + "," + userEmailsText,
           subject: templateExists?.subject || "Documentos para download",
-          text: sendDocumentsMailDinamicTemplateOptions.text(template),
+          text: sendDocumentsMailDinamicTemplateOptions.text(formattedTemplate),
           html: sendDocumentsMailDinamicTemplateOptions.html(
             user.name,
             folder,
-            template
+            formattedTemplate.replace(/\n/g, "<br/>")
           ),
           attachments: sendDocumentsMailOptions.attachments(
             documentName,
