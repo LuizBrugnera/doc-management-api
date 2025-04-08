@@ -12,6 +12,7 @@ import serviceRoutes from "./serviceRoutes";
 import serviceDataRoutes from "./serviceDataRoutes";
 import osHistoricRoutes from "./osHistoricRoutes";
 import emailTemplateRoutes from "./emailTemplateRoutes";
+import questionaryRoutes from "./questionaryRoutes";
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use("/services", serviceRoutes);
 router.use("/service-datas", serviceDataRoutes);
 router.use("/os-historics", osHistoricRoutes);
 router.use("/email-templates", emailTemplateRoutes);
+router.use("/questionary", questionaryRoutes);
 
 export default router;
