@@ -9,6 +9,34 @@ export class QuestionaryService {
     return await this.questionaryRepository.find();
   }
 
+  public async generateUniqueHash(length = 5): Promise<string> {
+    const maxAttempts = 10000;
+
+    for (let i = 0; i < maxAttempts; i++) {
+      const hash = Math.floor(Math.random() * Math.pow(10, length))
+        .toString()
+        .padStart(length, "0");
+
+      const exists = await this.checkIfExistsQuestionsWithHash(hash);
+      if (!exists) return hash;
+    }
+
+    throw new Error("Não foi possível gerar um hash único.");
+  }
+
+  async checkIfExistsQuestionsWithCpf(cpf: string): Promise<boolean> {
+    const exists = await this.questionaryRepository.findOne({
+      where: { cpf },
+    });
+    return !!exists;
+  }
+  async checkIfExistsQuestionsWithHash(hash: string): Promise<boolean> {
+    const exists = await this.questionaryRepository.findOne({
+      where: { hash },
+    });
+    return !!exists;
+  }
+
   async getQuestionaryById(id: number): Promise<Questionary | null> {
     return await this.questionaryRepository.findOne({
       where: { id },
@@ -16,9 +44,8 @@ export class QuestionaryService {
   }
 
   async createQuestionary(data: Partial<Questionary>): Promise<Questionary> {
-    const questionary = this.questionaryRepository.create({
-      ...data,
-    });
+    const hash = await this.generateUniqueHash();
+    const questionary = this.questionaryRepository.create({ ...data, hash });
     return await this.questionaryRepository.save(questionary);
   }
 

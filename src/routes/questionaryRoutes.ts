@@ -11,6 +11,14 @@ router.get(
   questionaryController.getQuestionaryById
 );
 router.get("/", authMiddleware, questionaryController.getAllQuestionarys);
+router.get(
+  "/check-if-exists/:cpf",
+  questionaryController.CheckIfExistsQuestionsWithCpf
+);
+router.get(
+  "/check-if-hash-exists/:hash",
+  questionaryController.CheckIfExistsQuestionsWithHash
+);
 //router.get("/all-of-cnpj/:cnpj", authMiddleware, questionaryController.getAllQuestionarysByCnpj);
 router.put("/:id", authMiddleware, questionaryController.updateQuestionary);
 router.delete("/:id", authMiddleware, questionaryController.deleteQuestionary);

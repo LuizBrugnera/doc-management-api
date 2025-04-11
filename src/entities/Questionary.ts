@@ -18,6 +18,15 @@ export class Questionary {
   cnpj: string;
 
   @Column()
+  email: string;
+
+  @Column()
+  hash: string;
+
+  @Column()
+  cpf: string;
+
+  @Column()
   setor: string;
 
   @Column("json")
