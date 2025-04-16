@@ -25,7 +25,6 @@ export class Admin {
   })
   phone: string;
 
-
   @Column()
   password: string;
 

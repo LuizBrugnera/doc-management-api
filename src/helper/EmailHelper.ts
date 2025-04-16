@@ -13,6 +13,9 @@ interface EmailOptions {
 
 export const EmailHelper = {
   sendMail: async (options: EmailOptions): Promise<boolean> => {
+    console.log("Enviando Email");
+    console.log(options.to);
+    console.log(options.subject);
     try {
       const transporter = nodemailer.createTransport({
         service: "gmail",

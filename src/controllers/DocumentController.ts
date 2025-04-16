@@ -512,7 +512,8 @@ export class DocumentController {
       const { name, type, description, folder, templateId } = req.body;
       const file = req.file;
       const uuid = req.uuidFile;
-
+      const notSendEmailNew = req.body.notSendEmail || "false";
+      const notSendEmail = JSON.parse(notSendEmailNew);
       if (!userId) {
         res.status(400).json({ message: "Usuário não encontrado" });
         return;
@@ -558,6 +559,21 @@ export class DocumentController {
         description: `Novo documento ${name} adicionado e pronto para download`,
         state: "success",
       });
+
+      if (notSendEmail) {
+        this.assignLogToUser({
+          userId: req.user!.id,
+          action: "Email não enviado",
+          date: new Date(),
+          description: `Email não enviado, por escolha do departamento ou administrador`,
+          role: req.user!.role,
+          state: "failure",
+        });
+        res.status(200).json({
+          message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId} nao enviou o email`,
+        });
+        return;
+      }
 
       const userEmails =
         await this.emailUserDepartmentService.getAssociationByUserId(user.id);
@@ -765,7 +781,8 @@ export class DocumentController {
       const file = req.file;
       const uuid = req.uuidFile;
       const userId = req.documentUserId;
-
+      const notSendEmailNew = req.body.notSendEmail || "false";
+      const notSendEmail = JSON.parse(notSendEmailNew);
       if (!userId) {
         res.status(400).json({ message: "Usuário não encontrado" });
         return;
@@ -855,18 +872,34 @@ export class DocumentController {
         });
         return;
       }
+
+      if (notSendEmail) {
+        this.assignLogToUser({
+          userId: req.user!.id,
+          action: "Email não enviado",
+          date: new Date(),
+          description: `Email não enviado, por escolha do departamento ou administrador`,
+          role: req.user!.role,
+          state: "failure",
+        });
+        res.status(200).json({
+          message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
+        });
+        return;
+      }
+
       const userEmails =
         await this.emailUserDepartmentService.getAssociationByUserId(user.id);
 
       const userEmailsText = userEmails.map((email) => email.email).join(", ");
-      console.log("Entrando para enviar o Email");
+
       try {
         const type = path.extname(uuid);
         const filePath = path.join(
           __dirname,
           `../../documents/${user.id}/${uuid}`
         );
-        console.log("FilePath", filePath);
+
         const pdfContent = fs.readFileSync(filePath);
 
         const depOrAdmin = await this.getDepOrAdminById(
