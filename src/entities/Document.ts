@@ -31,6 +31,15 @@ export class Document {
   @Column()
   folder: string;
 
+  @Column({ nullable: true })
+  totalFiles: number;
+
+  @Column({ nullable: true })
+  hash: string;
+
+  @Column({ nullable: true })
+  position: number;
+
   @Column({ default: false })
   isInvisible: boolean;
 

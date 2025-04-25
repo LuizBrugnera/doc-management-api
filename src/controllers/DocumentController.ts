@@ -19,6 +19,7 @@ import {
 import { Log } from "../entities/Log";
 import { EmailUserDepartmentService } from "../services/EmailUserDepartmentService";
 import { EmailTemplateService } from "../services/EmailTemplateService";
+import { documentCache } from "../cache/documentCache";
 
 export class DocumentController {
   private userService = new UserService();
@@ -509,7 +510,16 @@ export class DocumentController {
     try {
       const userId = parseInt(req.params.userId);
 
-      const { name, type, description, folder, templateId } = req.body;
+      const {
+        name,
+        type,
+        description,
+        folder,
+        templateId,
+        hash,
+        position,
+        totalFiles,
+      } = req.body;
       const file = req.file;
       const uuid = req.uuidFile;
       const notSendEmailNew = req.body.notSendEmail || "false";
@@ -543,6 +553,9 @@ export class DocumentController {
         user,
         uuid,
         folder,
+        hash,
+        position,
+        totalFiles,
       });
 
       await this.notificationService.createNotification({
@@ -560,7 +573,128 @@ export class DocumentController {
         state: "success",
       });
 
-      if (notSendEmail) {
+      let notSendEmail2 = false;
+
+      if (
+        documentCreated.position &&
+        documentCreated.totalFiles &&
+        documentCreated.hash
+      ) {
+        if (!Array.isArray(documentCache[documentCreated.hash])) {
+          documentCache[documentCreated.hash] = [];
+        }
+
+        documentCache[documentCreated.hash].push({
+          position: documentCreated.position,
+          uuid: documentCreated.uuid,
+          type: documentCreated.type,
+          folder: documentCreated.folder,
+        });
+ 
+        if (
+          +documentCreated.totalFiles !==
+          +documentCache[documentCreated.hash].length
+        ) {
+          console.log("entrou no nao enviar");
+          notSendEmail2 = true;
+        } else if (
+          +documentCache[documentCreated.hash].length ===
+          +documentCreated.totalFiles
+        ) {
+          console.log("entrou no enviar");
+          const userEmails =
+            await this.emailUserDepartmentService.getAssociationByUserId(
+              user.id
+            );
+
+          const userEmailsText = userEmails
+            .map((email) => email.email)
+            .join(", ");
+          try {
+            const attachments = documentCache[documentCreated.hash].map(
+              (file) => {
+                return {
+                  filename: `${file.folder}-${file.position}.${file.type}`,
+                  content: fs.readFileSync(
+                    path.join(
+                      __dirname,
+                      `../../documents/${user.id}/${file.uuid}`
+                    )
+                  ),
+                };
+              }
+            );
+
+            const formattedDate = formatDateToDDMMYYYY(formatDateToMySQL(date));
+            const templateExists =
+              await this.emailTemplateService.getEmailTemplateById(templateId);
+
+            const values = {
+              nome: user.name,
+              email: user.mainEmail,
+              cpf: user.cpf || "Não Informado",
+              cnpj: user.cnpj || "Não Informado",
+            };
+
+            const template = templateExists?.content || "Olá,";
+
+            const formattedTemplate = this.replacePlaceholders(
+              template,
+              values
+            );
+
+            const documentName = `${
+              DocumentController.folderShortNames[folder]
+            } - ${name.split(".")[0]} - ${formattedDate}.${type}`;
+
+            EmailHelper.sendMail({
+              to: userEmailsText
+                ? user.mainEmail + "," + userEmailsText
+                : user.mainEmail,
+              subject: templateExists?.subject || "Documentos para download",
+              text: sendDocumentsMailDinamicTemplateOptions.text(
+                formattedTemplate
+              ),
+              html: sendDocumentsMailDinamicTemplateOptions.html(
+                user.name,
+                documentName,
+                formattedTemplate.replace(/\n/g, "<br/>")
+              ),
+              attachments: attachments,
+            }).then((result) => {
+              if (req.user?.id && req.user.role) {
+                if (result) {
+                  this.assignLogToUser({
+                    userId: req.user.id,
+                    action: "Email enviado com Sucesso",
+                    date: new Date(),
+                    description: `Sucesso ao enviar o email para ${userEmailsText} com o documento ${documentName}`,
+                    role: req.user.role,
+                    state: "success",
+                  });
+                } else {
+                  if (req.user?.id && req.user.role) {
+                    this.assignLogToUser({
+                      userId: req.user.id,
+                      action: "Falha ao enviar o email",
+                      date: new Date(),
+                      description: `Falha ao enviar o email para o email ${userEmailsText},  usuario - ${user.name}, com o documento - ${documentName}, u ID{${user.id}} c ID {${documentCreated.id}}`,
+                      role: req.user.role,
+                      state: "failure",
+                    });
+                  }
+                }
+              }
+            });
+          } catch (error) {}
+          res.status(200).json({
+            message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
+          });
+          return;
+        }
+      }
+
+      if (notSendEmail || notSendEmail2) {
         this.assignLogToUser({
           userId: req.user!.id,
           action: "Email não enviado",
@@ -610,6 +744,7 @@ export class DocumentController {
         const documentName = `${
           DocumentController.folderShortNames[folder]
         } - ${name.split(".")[0]} - ${formattedDate}.${type}`;
+
         EmailHelper.sendMail({
           to: userEmailsText
             ? user.mainEmail + "," + userEmailsText
