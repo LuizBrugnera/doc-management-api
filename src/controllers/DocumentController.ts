@@ -590,18 +590,19 @@ export class DocumentController {
           type: documentCreated.type,
           folder: documentCreated.folder,
         });
- 
+
         if (
           +documentCreated.totalFiles !==
           +documentCache[documentCreated.hash].length
         ) {
-          console.log("entrou no nao enviar");
           notSendEmail2 = true;
         } else if (
           +documentCache[documentCreated.hash].length ===
           +documentCreated.totalFiles
         ) {
-          console.log("entrou no enviar");
+          /// removendo o documento do cache
+          delete documentCache[documentCreated.hash];
+
           const userEmails =
             await this.emailUserDepartmentService.getAssociationByUserId(
               user.id
