@@ -14,6 +14,8 @@ import osHistoricRoutes from "./osHistoricRoutes";
 import emailTemplateRoutes from "./emailTemplateRoutes";
 import questionaryRoutes from "./questionaryRoutes";
 import companyRoutes from "./companyRoutes";
+import questionRoutes from "./questionRoutes";
+import subQuestionRoutes from "./subQuestionRoutes";
 
 const router = Router();
 
@@ -32,5 +34,7 @@ router.use("/os-historics", osHistoricRoutes);
 router.use("/email-templates", emailTemplateRoutes);
 router.use("/questionary", questionaryRoutes);
 router.use("/company", companyRoutes);
+router.use("/questions", questionRoutes);
+router.use("/subquestions", subQuestionRoutes);
 
 export default router;
