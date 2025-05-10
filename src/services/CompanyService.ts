@@ -49,6 +49,12 @@ export class CompanyService {
     });
   }
 
+  async getCompanyByCnpj(cnpj: string): Promise<Company | null> {
+    return await this.companyRepository.findOne({
+      where: { cnpj },
+    });
+  }
+
   async createCompany(data: Partial<Company>): Promise<Company> {
     const hash = await this.generateUniqueHash();
     const company = this.companyRepository.create({ ...data, hash });

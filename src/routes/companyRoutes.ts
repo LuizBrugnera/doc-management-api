@@ -6,6 +6,7 @@ const router = Router();
 const companyController = new CompanyController();
 
 router.get("/one/:id", authMiddleware, companyController.getCompanyById);
+router.post("/cnpj", authMiddleware, companyController.getCompanyByCnpj);
 router.get("/", authMiddleware, companyController.getAllCompanys);
 router.get(
   "/check-if-hash-exists/:hash",

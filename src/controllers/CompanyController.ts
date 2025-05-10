@@ -17,6 +17,22 @@ export class CompanyController {
     }
   };
 
+  public getCompanyByCnpj = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const cnpj = req.body.cnpj;
+      const company = await this.companyService.getCompanyByCnpj(cnpj);
+      if (!company) {
+        res.status(404).json({ message: "Company não encontrado" });
+      }
+      res.json(company);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public getCompanyByHash = async (
     req: Request,
     res: Response
