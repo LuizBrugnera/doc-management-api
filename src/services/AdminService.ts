@@ -24,6 +24,18 @@ export class AdminService {
     });
   }
 
+  async updatePasswordByEmail(email: string, password: string): Promise<void> {
+    const admin = await this.adminRepository.findOneBy({
+      email: email,
+    });
+    if (!admin) {
+      return;
+    }
+    this.adminRepository.update(admin.id, { password });
+
+    await this.adminRepository.save(admin);
+  }
+
   async getAdminByIdWithPassword(id: number): Promise<Admin | null> {
     return await this.adminRepository.findOne({
       where: { id },

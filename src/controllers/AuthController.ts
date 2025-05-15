@@ -392,15 +392,50 @@ export class AuthController {
       }
 
       const hashedPassword = await this.authService.hashPassword(password);
+      // verificar se é um admin, usuario ou department
 
-      await this.userService.updatePasswordByEmail(
-        resetToken.email,
-        hashedPassword
+      const user = await this.userService.getUserByEmail(resetToken.email);
+
+      if (user) {
+        await this.userService.updatePasswordByEmail(
+          resetToken.email,
+          hashedPassword
+        );
+
+        resetTokens.delete(token);
+        res.status(200).send("Password reset successfully.");
+        return;
+      }
+
+      const department = await this.departmentService.getDepartmentByEmail(
+        resetToken.email
       );
 
-      resetTokens.delete(token);
+      if (department) {
+        await this.departmentService.updatePasswordByEmail(
+          resetToken.email,
+          hashedPassword
+        );
 
-      res.status(200).send("Password reset successfully.");
+        resetTokens.delete(token);
+        res.status(200).send("Password reset successfully.");
+        return;
+      }
+
+      const admin = await this.adminService.getAdminByEmail(resetToken.email);
+      if (admin) {
+        await this.adminService.updatePasswordByEmail(
+          resetToken.email,
+          hashedPassword
+        );
+
+        resetTokens.delete(token);
+        res.status(200).send("Password reset successfully.");
+        return;
+      }
+
+      res.status(400).send("Invalid email.");
+      return;
     } catch (error) {
       res.status(500).send("Erro ao redefinir senha.");
       return;

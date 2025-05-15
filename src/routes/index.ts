@@ -16,6 +16,7 @@ import questionaryRoutes from "./questionaryRoutes";
 import companyRoutes from "./companyRoutes";
 import questionRoutes from "./questionRoutes";
 import subQuestionRoutes from "./subQuestionRoutes";
+import addressRoutes from "./addressRoutes";
 
 const router = Router();
 
@@ -36,5 +37,6 @@ router.use("/questionary", questionaryRoutes);
 router.use("/company", companyRoutes);
 router.use("/questions", questionRoutes);
 router.use("/subquestions", subQuestionRoutes);
+router.use("/address", addressRoutes);
 
 export default router;

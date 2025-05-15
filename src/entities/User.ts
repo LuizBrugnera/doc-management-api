@@ -9,6 +9,7 @@ import {
 import { Document } from "./Document";
 import { Notification } from "./Notification";
 import { EmailUserDepartment } from "./EmailUserDepartment";
+import { Address } from "./Address";
 
 @Entity()
 export class User {
@@ -56,6 +57,9 @@ export class User {
 
   @OneToMany(() => Document, (document) => document.user)
   documents: Document[];
+
+  @OneToMany(() => Address, (address) => address.user)
+  addresses: Address[];
 
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];

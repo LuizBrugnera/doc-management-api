@@ -22,6 +22,18 @@ export class DepartmentService {
     });
   }
 
+  async updatePasswordByEmail(email: string, password: string): Promise<void> {
+    const department = await this.departmentRepository.findOneBy({
+      email: email,
+    });
+    if (!department) {
+      return;
+    }
+    this.departmentRepository.update(department.id, { password });
+
+    await this.departmentRepository.save(department);
+  }
+
   async getDepartmentByEmail(email: string): Promise<Department | null> {
     return await this.departmentRepository.findOne({
       where: { email },

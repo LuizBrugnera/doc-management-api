@@ -15,6 +15,9 @@ export class Company {
   name: string;
 
   @Column()
+  email: string;
+
+  @Column()
   cnpj: string;
 
   @Column()
