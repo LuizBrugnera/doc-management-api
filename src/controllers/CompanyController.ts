@@ -101,6 +101,7 @@ export class CompanyController {
 
       const hash = company.hash;
       const email = company.email;
+      const name = company.name;
       EmailHelper.sendMail({
         to: email,
         subject: "Cadastro de empresa realizado com sucesso!",
@@ -111,7 +112,7 @@ export class CompanyController {
               ✅ Cadastro Realizado com Sucesso!
             </h2>
             <p style="font-size:16px; line-height:1.5;">
-              A empresa <strong>ASSESSORIA EM SEGURANÇA DO TRABALHO LTDA</strong>
+              A empresa <strong>${name}</strong>
               foi cadastrada com sucesso em nosso sistema.
             </p>
       
