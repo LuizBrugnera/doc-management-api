@@ -103,44 +103,91 @@ export class CompanyController {
       const email = company.email;
       EmailHelper.sendMail({
         to: email,
-        subject: "Cadastro de empresa para Avaliação Psicossocial",
+        subject: "Cadastro de empresa realizado com sucesso!",
         html: `
-    <div style="font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-  <h2 style="color: #2c3e50; text-align: center;">Link Personalizado</h2>
-
-  <p style="font-size: 16px; color: #555;">Olá,</p>
-  <p style="font-size: 16px; color: #555;">
-    O seu link personalizado para o questionário de avaliação psicossocial é:
-  </p>
-
-  <div style="text-align: center; margin: 20px 0;">
-    <span style="font-size: 22px; font-weight: bold; color: #007bff; background-color: #e7f3ff; padding: 10px 20px; border-radius: 5px; display: inline-block;">
+          <div style="font-family: Arial, sans-serif; color:#333; background:#f9f9f9; padding:24px; border-radius:8px; max-width:620px; margin:0 auto; box-shadow:0 0 10px rgba(0,0,0,0.06);">
+            <!-- Cabeçalho -->
+            <h2 style="color:#2c3e50; text-align:center; margin-top:0;">
+              ✅ Cadastro Realizado com Sucesso!
+            </h2>
+            <p style="font-size:16px; line-height:1.5;">
+              A empresa <strong>ASSESSORIA EM SEGURANÇA DO TRABALHO LTDA</strong>
+              foi cadastrada com sucesso em nosso sistema.
+            </p>
+      
+            <!-- Questionário -->
+            <h3 style="color:#2c3e50; margin-bottom:8px;">📄 Acesse o questionário da empresa</h3>
+            <p style="font-size:16px; line-height:1.5;">
+              Clique no link abaixo para responder ao questionário psicossocial:
+            </p>
+            <p style="text-align:center; margin:20px 0;">
+              <a href="https://acessoria-de-seguranca-do-trabalho.com/questionario/${hash}"
+                 style="font-size:18px; font-weight:bold; color:#fff; background:#007bff; padding:12px 24px; border-radius:6px; text-decoration:none; display:inline-block;">
+                Abrir Questionário
+              </a>
+            </p>
+      
+            <!-- Acesso à plataforma -->
+            <h3 style="color:#2c3e50; margin-bottom:8px;">🔐 Acesso à Plataforma</h3>
+            <p style="font-size:16px; line-height:1.5;">
+              Para editar os dados da empresa ou consultar documentos, acesse:
+              <br />
+              <a href="https://acessoria-de-seguranca-do-trabalho.com/login" style="color:#007bff;">
+                https://acessoria-de-seguranca-do-trabalho.com/login
+              </a>
+            </p>
+            <ul style="font-size:16px; line-height:1.6; padding-left:18px; margin:8px 0;">
+              <li><strong>Login:</strong> CNPJ completo da empresa (ex.: 12.345.678/0001-00)</li>
+              <li><strong>Senha:</strong> 8 primeiros dígitos do CNPJ (ex.: 12345678)</li>
+            </ul>
+            <p style="font-size:15px; margin-top:4px;">
+              Importante: selecione a opção <em>"Acesso via CNPJ"</em>.
+              Após o primeiro acesso, recomendamos alterar a senha padrão em
+              <strong>Minha Conta</strong>.
+            </p>
+      
+            <!-- O que é possível fazer -->
+            <h3 style="color:#2c3e50; margin-bottom:8px;">⚙ O que você pode fazer na plataforma</h3>
+            <ul style="font-size:16px; line-height:1.6; padding-left:18px; margin:8px 0;">
+              <li>Editar os dados da empresa</li>
+              <li>Inserir ou atualizar funções e colaboradores</li>
+              <li>Baixar os documentos emitidos</li>
+              <li>Extrair o link do questionário psicossocial</li>
+            </ul>
+      
+            <p style="font-size:16px; line-height:1.5;">Qualquer dúvida, estamos à disposição.</p>
+      
+            <p style="font-size:16px; font-weight:bold;">Equipe BETELSEG</p>
+      
+            <hr style="border:none; height:1px; background:#e0e0e0; margin:32px 0;" />
+      
+            <p style="font-size:12px; color:#777; text-align:center; margin:0;">
+              © 2025 BETELSEG. Todos os direitos reservados.
+            </p>
+          </div>
+        `,
+        text: `
+      ✅ Cadastro Realizado com Sucesso!
+      
+      A empresa ASSESSORIA EM SEGURANÇA DO TRABALHO LTDA foi cadastrada em nosso sistema.
+      
+      📄 Questionário:
       https://acessoria-de-seguranca-do-trabalho.com/questionario/${hash}
-    </span>
-  </div>
-
-  <!-- Novo parágrafo sobre a plataforma -->
-  <p style="font-size: 16px; color: #555;">
-    A plataforma
-    <strong>acessoria-de-seguranca-do-trabalho.com</strong>
-    é a área exclusiva do cliente BetelSeg. Nela, você pode consultar todos os
-    documentos relacionados à sua empresa, editar ou atualizar as informações
-    cadastrais necessárias para este questionário e, sempre que precisar,
-    adicionar novos colaboradores ou ajustar os dados dos já cadastrados.
-    Assim, mantemos seu relatório psicossocial sempre em dia e em
-    conformidade com as normas.
-  </p>
-
-  <p style="font-size: 16px; color: #555;">Atenciosamente,</p>
-  <p style="font-size: 16px; color: #555; font-weight: bold;">Equipe BETELSEG</p>
-
-  <hr style="border: none; height: 1px; background-color: #eee; margin: 20px 0;" />
-
-  <p style="font-size: 12px; color: #999; text-align: center;">
-    © 2024 BETELSEG. Todos os direitos reservados.
-  </p>
-</div>`,
-        text: `O seu link personalizado para o questionário para o relatório de avaliação psicossocial é: ${hash}`,
+      
+      🔐 Acesso à plataforma:
+      https://acessoria-de-seguranca-do-trabalho.com/login
+        • Login: CNPJ completo da empresa (ex.: 12.345.678/0001-00)
+        • Senha: 8 primeiros dígitos do CNPJ (ex.: 12345678)
+        (Use a opção "Acesso via CNPJ" e altere a senha em Minha Conta após o primeiro login.)
+      
+      ⚙ Na plataforma você poderá:
+        • Editar os dados da empresa
+        • Inserir ou atualizar funções e colaboradores
+        • Baixar os documentos emitidos
+        • Extrair o link do questionário psicossocial
+      
+      Equipe BETELSEG – © 2025
+      `,
       });
 
       res.status(201).json(company);
