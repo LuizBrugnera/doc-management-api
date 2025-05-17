@@ -97,6 +97,17 @@ export class CompanyController {
     try {
       const data = req.body;
       data.completed = false;
+
+      // verifica se o cnpj já existe
+      const exists = await this.companyService.checkIfExistsQuestionsWithCnpj(
+        data.cnpj
+      );
+
+      if (exists) {
+        res.status(400).json({ message: "Empresa já cadastrada" });
+        return;
+      }
+
       const company = await this.companyService.createCompany(data);
 
       const hash = company.hash;
