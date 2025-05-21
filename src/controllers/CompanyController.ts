@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { CompanyService } from "../services/CompanyService";
 import { EmailHelper } from "../helper/EmailHelper";
+import { QuestionaryService } from "../services/QuestionaryService";
 
 export class CompanyController {
   private companyService = new CompanyService();
+  private questionaryService = new QuestionaryService();
 
   public getAllCompanys = async (
     req: Request,
@@ -225,6 +227,22 @@ export class CompanyController {
   public deleteCompany = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
+
+      const company = await this.companyService.getCompanyById(id);
+      if (!company) {
+        res.status(404).json({ message: "Company não encontrado" });
+        return;
+      }
+
+      const questionaries =
+        await this.questionaryService.getAllQuestionaryByCnpj(company.cnpj);
+
+      if (questionaries && questionaries.length > 0) {
+        for (const questionary of questionaries) {
+          await this.questionaryService.deleteQuestionary(questionary.id);
+        }
+      }
+
       const success = await this.companyService.deleteCompany(id);
       if (!success) {
         res.status(404).json({ message: "Company não encontrado" });

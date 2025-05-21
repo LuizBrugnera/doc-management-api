@@ -9,6 +9,16 @@ export class QuestionaryService {
     return await this.questionaryRepository.find();
   }
 
+  public async getAllQuestionaryByCnpj(
+    cnpj: string
+  ): Promise<Questionary[] | null> {
+    const questionary = await this.questionaryRepository.find({
+      where: { cnpj },
+    });
+
+    return questionary;
+  }
+
   public async generateUniqueHash(length = 5): Promise<string> {
     const maxAttempts = 10000;
 
