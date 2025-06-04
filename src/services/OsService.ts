@@ -7,7 +7,7 @@ import fs from "fs";
 import { User } from "../entities/User";
 import { Document } from "../entities/Document";
 import { ServiceService } from "./ServiceService";
-
+import { In } from "typeorm";
 import { OsHistoricService } from "./OsHistoricService";
 dotenv.config();
 
@@ -15,6 +15,7 @@ export class OsService {
   private osRepository = AppDataSource.getRepository(Os);
   private serviceService = new ServiceService();
   private serviceDataRepository = AppDataSource.getRepository(ServiceData);
+  private documentRepository = AppDataSource.getRepository(Document);
   private osHistoricService = new OsHistoricService();
   private API_URL =
     "https://api.beteltecnologia.com/ordens_servicos/?loja&pagina=";
@@ -383,36 +384,51 @@ export class OsService {
     }
   }
 
-  async getAllOss(): Promise<Os[]> {
+  async getAllOss(): Promise<any[]> {
+    // 1. Busca das OS com os joins usuais
     const oss = await this.osRepository
       .createQueryBuilder("os")
       .leftJoinAndSelect("os.services", "services")
-      .leftJoinAndSelect("os.osHistoric", "osHistoric") // ← adiciona a relação com OsHistoric
-      .where("os.situationName NOT IN (:...excludedSituations)", {
-        excludedSituations: ["Em aberto", "Aguardando pagamento"],
+      .leftJoinAndSelect("os.osHistoric", "osHistoric")
+      .leftJoinAndSelect("os.assignedDocument", "assignedDocument")
+      .where("os.situationName NOT IN (:...excluded)", {
+        excluded: ["Em aberto", "Aguardando pagamento"],
       })
       .getMany();
 
-    const documents = await this.osRepository
-      .createQueryBuilder("os")
-      .leftJoin(User, "user", "user.name = os.clientName")
-      .leftJoin(Document, "document", "document.user_id = user.id")
-      .select(["os.id AS os_id", "GROUP_CONCAT(document.id) AS documents"])
-      .groupBy("os.id")
-      .getRawMany();
-
-    const documentMap = new Map<number, number[]>();
-    documents.forEach((doc) => {
-      documentMap.set(
-        doc.os_id,
-        doc.documents ? doc.documents.split(",").map(Number) : []
-      );
+    // 2. Coleta de TODOS os IDs de documentos referenciados
+    const allDocIds = new Set<number>();
+    oss.forEach(({ documentosOs }) => {
+      documentosOs
+        ?.split(",")
+        .map((s) => Number(s.trim()))
+        .filter((n) => !Number.isNaN(n))
+        .forEach((n) => allDocIds.add(n));
     });
 
-    return oss.map((os) => ({
-      ...os,
-      documents: documentMap.get(os.id) || [],
-    }));
+    // 3. Busca de todos os documentos em um único hit
+    let docMap = new Map<number, Document>();
+    if (allDocIds.size) {
+      const docs = await this.documentRepository.find({
+        where: { id: In([...allDocIds]) },
+      });
+      docMap = new Map(docs.map((d) => [d.id, d]));
+    }
+
+    // 4. Monta o retorno, substituindo pelos objetos
+    return oss.map((os) => {
+      const ids = os.documentosOs
+        ? os.documentosOs
+            .split(",")
+            .map((s) => Number(s.trim()))
+            .filter((n) => !Number.isNaN(n))
+        : [];
+
+      return {
+        ...os,
+        documents: ids.map((id) => id.toString()).filter(Boolean),
+      };
+    });
   }
 
   async getOsById(id: number): Promise<Os | null> {

@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Service } from "./Service";
 import { OsHistoric } from "./OsHistoric";
+import { AssignedDocument } from "./AssignedDocument";
 
 @Entity()
 export class Os {
@@ -108,8 +109,14 @@ export class Os {
   @Column({ default: "page" })
   type: string;
 
+  @Column({ default: "" })
+  documentosOs: string;
+
   @OneToMany(() => Service, (service) => service.os)
   services: Service[];
+
+  @OneToMany(() => AssignedDocument, (assignedDocument) => assignedDocument.os)
+  assignedDocument: AssignedDocument[];
 
   @OneToMany(() => OsHistoric, (osHistoric) => osHistoric.os)
   osHistoric: OsHistoric[];

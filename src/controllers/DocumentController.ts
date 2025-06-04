@@ -519,6 +519,7 @@ export class DocumentController {
         hash,
         position,
         totalFiles,
+        isInvisible,
       } = req.body;
       const file = req.file;
       const uuid = req.uuidFile;
@@ -556,6 +557,7 @@ export class DocumentController {
         hash,
         position,
         totalFiles,
+        isInvisible: !!isInvisible || false,
       });
 
       await this.notificationService.createNotification({
@@ -689,7 +691,7 @@ export class DocumentController {
             });
           } catch (error) {}
           res.status(200).json({
-            message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId}`,
+            id: documentCreated.id,
           });
           return;
         }
@@ -705,7 +707,7 @@ export class DocumentController {
           state: "failure",
         });
         res.status(200).json({
-          message: `Arquivo ${file.originalname} salvo com sucesso para o usuário ${userId} nao enviou o email`,
+          id: documentCreated.id,
         });
         return;
       }

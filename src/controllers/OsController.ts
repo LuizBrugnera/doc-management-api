@@ -77,7 +77,17 @@ export class OsController {
   public updateOs = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);
+      const osExists = await this.osService.getOsById(id);
+      if (!osExists) {
+        res.status(404).json({ message: "Os não encontrado" });
+      }
+      if (req.body.documentosOs) {
+        req.body.documentosOs =
+          osExists?.documentosOs + "," + req.body.documentosOs;
+      }
+
       const osData = req.body;
+
       const os = await this.osService.updateOs(id, osData);
       if (!os) {
         res.status(404).json({ message: "Os não encontrado" });

@@ -5,8 +5,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from "typeorm";
 import { User } from "./User";
+import { AssignedDocument } from "./AssignedDocument";
 
 @Entity()
 export class Document {
@@ -47,6 +49,16 @@ export class Document {
     onDelete: "CASCADE",
   })
   user: User;
+
+  @OneToOne(
+    () => AssignedDocument,
+    (assignedDocument) => assignedDocument.document,
+    {
+      onDelete: "CASCADE",
+      nullable: true,
+    }
+  )
+  assignedDocument: AssignedDocument;
 
   @CreateDateColumn()
   created_at: Date;
