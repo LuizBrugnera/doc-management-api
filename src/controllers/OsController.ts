@@ -74,6 +74,15 @@ export class OsController {
     }
   };
 
+  public fixTemporary = async (req: Request, res: Response): Promise<void> => {
+    try {
+      await this.osService.fixTheDocumentsToOs();
+      res.status(201);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public updateOs = async (req: Request, res: Response): Promise<void> => {
     try {
       const id = parseInt(req.params.id);

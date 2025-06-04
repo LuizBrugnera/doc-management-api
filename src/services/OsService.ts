@@ -39,6 +39,31 @@ export class OsService {
     });
   }
 
+  public async fixTheDocumentsToOs() {
+    const allDocuments = await this.documentRepository.find({
+      where: { isInvisible: false },
+      relations: ["user"],
+    });
+
+    for (const document of allDocuments) {
+      const os = await this.osRepository.findOne({
+        where: { clientId: document.user.cod },
+      });
+
+      if (!os || document.folder !== "ordensServico") {
+        continue;
+      }
+
+      if (os.status === "done_delivered") {
+        await this.osRepository.update(os.id, {
+          documentosOs: os.documentosOs
+            ? os.documentosOs + "," + document.id
+            : document.id.toString(),
+        });
+      }
+    }
+  }
+
   private async fetchTotalPages(): Promise<number> {
     try {
       const response = await axios.get(`${this.API_URL}1`, {
