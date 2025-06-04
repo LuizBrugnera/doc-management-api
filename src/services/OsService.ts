@@ -40,6 +40,9 @@ export class OsService {
   }
 
   public async fixTheDocumentsToOs() {
+    /// setar todos os documentosOs como ""
+    await this.osRepository.update({}, { documentosOs: "" });
+
     const allDocuments = await this.documentRepository.find({
       where: { isInvisible: false },
       relations: ["user"],
