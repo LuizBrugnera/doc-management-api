@@ -2,10 +2,12 @@ import { Request, Response } from "express";
 import { AssignedDocumentService } from "../services/AssignedDocumentService";
 import { DocumentService } from "../services/DocumentService";
 import { stat } from "fs";
+import { OsService } from "../services/OsService";
 
 export class AssignedDocumentController {
   private assignedDocumentService = new AssignedDocumentService();
   private documentService = new DocumentService();
+  private osService = new OsService();
 
   public getAllAssignedDocuments = async (
     req: Request,
@@ -55,7 +57,7 @@ export class AssignedDocumentController {
         return;
       }
 
-      const osExists = await this.documentService.getDocumentById(osId);
+      const osExists = await this.osService.getOsById(osId);
 
       if (!osExists) {
         res.status(404).json({ message: "Os not found" });
