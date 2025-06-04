@@ -42,24 +42,24 @@ export class OsService {
   public async fixTheDocumentsToOs() {
     /// setar todos os documentosOs como ""
     await this.osRepository.update({}, { documentosOs: "" });
-
+    console.log("Atualizando documentosOs");
     const allDocuments = await this.documentRepository.find({
       where: { isInvisible: false },
       relations: ["user"],
     });
-
+    console.log("Buscando os");
     // Buscar todas as ordens de serviço de uma vez, para melhorar performance
     const orders = await this.osRepository.find({
       where: { clientId: In(allDocuments.map((doc) => doc.user.cod)) },
     });
-
+    console.log("Encontrados", orders.length, "ordens de serviço");
     for (const document of allDocuments) {
       const os = orders.find((order) => order.clientId === document.user.cod);
 
       if (!os || document.folder !== "ordensServico") {
         continue;
       }
-
+      console.log("Encontrei", os.id, "para", document.user.cod);
       if (os.status === "done_delivered") {
         // Verifica se documentosOs é um array ou string
         const documentosOs = os.documentosOs ? os.documentosOs : "";
@@ -72,6 +72,8 @@ export class OsService {
         });
       }
     }
+
+    console.log("Documentos atualizados");
   }
 
   private async fetchTotalPages(): Promise<number> {
