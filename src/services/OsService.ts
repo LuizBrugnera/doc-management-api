@@ -45,20 +45,27 @@ export class OsService {
       relations: ["user"],
     });
 
+    // Buscar todas as ordens de serviço de uma vez, para melhorar performance
+    const orders = await this.osRepository.find({
+      where: { clientId: In(allDocuments.map((doc) => doc.user.cod)) },
+    });
+
     for (const document of allDocuments) {
-      const os = await this.osRepository.findOne({
-        where: { clientId: document.user.cod },
-      });
+      const os = orders.find((order) => order.clientId === document.user.cod);
 
       if (!os || document.folder !== "ordensServico") {
         continue;
       }
 
       if (os.status === "done_delivered") {
+        // Verifica se documentosOs é um array ou string
+        const documentosOs = os.documentosOs ? os.documentosOs : "";
+        const updatedDocumentosOs = documentosOs
+          .split(",")
+          .concat(document.id.toString())
+          .join(",");
         await this.osRepository.update(os.id, {
-          documentosOs: os.documentosOs
-            ? os.documentosOs + "," + document.id
-            : document.id.toString(),
+          documentosOs: updatedDocumentosOs,
         });
       }
     }
