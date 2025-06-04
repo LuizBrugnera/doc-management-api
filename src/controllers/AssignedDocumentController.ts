@@ -45,7 +45,7 @@ export class AssignedDocumentController {
       const data = req.body;
 
       const { documentId, osId } = data;
-
+      console.log(documentId, osId);
       const documentExists = await this.documentService.getDocumentById(
         documentId
       );

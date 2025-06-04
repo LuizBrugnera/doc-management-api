@@ -16,6 +16,6 @@ router.patch(
   osController.updateOsWithServices
 );
 router.patch("/update-api", authMiddleware, osController.updateOsDbWithGestao);
-router.get("/fix", osController.fixTemporary);
+//router.get("/fix", osController.fixTemporary);
 
 export default router;
