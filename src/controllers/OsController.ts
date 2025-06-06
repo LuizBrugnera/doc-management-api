@@ -64,6 +64,19 @@ export class OsController {
     }
   };
 
+  public getOsByStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const status = req.params.status;
+      const os = await this.osService.getOsByStatus(status);
+      if (!os) {
+        res.status(404).json({ message: "Osistrador não encontrado" });
+      }
+      res.json(os);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   public createOs = async (req: Request, res: Response): Promise<void> => {
     try {
       const osData = req.body;

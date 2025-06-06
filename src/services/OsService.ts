@@ -39,6 +39,13 @@ export class OsService {
     });
   }
 
+  public async getOsByStatus(status: string): Promise<Os[]> {
+    return await this.osRepository.find({
+      where: { status },
+      relations: ["assignedDocument"],
+    });
+  }
+
   public async fixTheDocumentsToOs() {
     /// setar todos os documentosOs como ""
     await this.osRepository.update({}, { documentosOs: "" });
