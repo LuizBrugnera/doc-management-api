@@ -216,43 +216,6 @@ export class OsService {
               : data_entrada,
           });
         }
-
-        if (!osExists.atribuicao) {
-          const services = osExists.services;
-          const atribuicoesSet = new Set<string>();
-          let medicoPresente = false;
-
-          for (const service of services) {
-            const serviceData = await this.serviceDataRepository.findOne({
-              where: { name: service.name },
-            });
-
-            if (serviceData && serviceData.atribuicao) {
-              const atribuicoes = serviceData.atribuicao
-                .split(",")
-                .map((a) => a.trim());
-
-              for (const a of atribuicoes) {
-                if (a.toLowerCase() === "médico") {
-                  medicoPresente = true;
-                } else if (!atribuicoesSet.has(a)) {
-                  atribuicoesSet.add(a);
-                }
-              }
-            }
-          }
-
-          let atribuicaoFinal = Array.from(atribuicoesSet);
-          if (medicoPresente) {
-            atribuicaoFinal.push("Médico");
-          }
-
-          const atribuicao = atribuicaoFinal.join(", ");
-
-          await this.updateOs(osExists.id, {
-            atribuicao,
-          });
-        }
       }
     } catch (error) {
       this.logErrorToFile(
@@ -339,6 +302,40 @@ export class OsService {
         // Caso tenha 4 ou mais tipos, não atualiza (ou ajuste se quiser outro comportamento)
         else {
           return null;
+        }
+
+        if (!os.atribuicao) {
+          const services = os.services;
+          const atribuicoesSet = new Set<string>();
+          let medicoPresente = false;
+
+          for (const service of services) {
+            const serviceData = allServices.find(
+              (s) => s.name === service.name
+            );
+
+            if (serviceData && serviceData.atribuicao) {
+              const atribuicoes = serviceData.atribuicao
+                .split(",")
+                .map((a) => a.trim());
+
+              for (const a of atribuicoes) {
+                if (a.toLowerCase() === "médico") {
+                  medicoPresente = true;
+                } else if (!atribuicoesSet.has(a)) {
+                  atribuicoesSet.add(a);
+                }
+              }
+            }
+          }
+
+          let atribuicaoFinal = Array.from(atribuicoesSet);
+          if (medicoPresente) {
+            atribuicaoFinal.push("Médico");
+          }
+
+          const atribuicao = atribuicaoFinal.join(", ");
+          os.atribuicao = atribuicao;
         }
 
         // Retorna a OS atualizada
