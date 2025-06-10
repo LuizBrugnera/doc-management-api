@@ -35,6 +35,9 @@ export class ServiceData {
   })
   duration: string;
 
+  @Column()
+  atribuicao: string;
+
   @CreateDateColumn()
   created_at: Date;
 

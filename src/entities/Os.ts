@@ -109,6 +109,9 @@ export class Os {
   @Column({ default: "page" })
   type: string;
 
+  @Column()
+  atribuicao: string;
+
   @Column({ default: "" })
   documentosOs: string;
 
